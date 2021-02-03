@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 from sklearn.model_selection import train_test_split
 import contractions
 from nltk import word_tokenize
+import nltk
 import re, itertools
 from nltk.corpus import stopwords
 import pandas as pd
@@ -23,29 +24,28 @@ def main():
     for user in users:
         user["tokens"] = tokenize_text(user["clean_text"])
 
+    # pos tambien
+    for user in users:
+        user["pos_tags"] = pos_tag_text(user["tokens"])
+
 
     print(users[0])
 
-    dataFrame = pd.DataFrame(users)
-    print(dataFrame.columns)
-    train_x, test_x, train_y, test_y = train_test_split(dataFrame[["user", "text", "title", "clean_text", "tokens"]], dataFrame['g_truth'], test_size=0.33)
+    # convert to dataFrame, and choose which columns to conserve
+    data_frame = pd.DataFrame(users)
+    print(data_frame.columns)
 
-    # label encode the target variable
+    # separate data in train and test
+    train_x, test_x, train_y, test_y = train_test_split(data_frame[["user", "date", "text", "title", "clean_text",
+                                                                    "tokens", "pos_tags"]], data_frame['g_truth'], test_size=0.33)
+    # label encode the target variable (I think this is not necessary?)
     encoder = preprocessing.LabelEncoder()
     train_y = encoder.fit_transform(train_y)
     test_y = encoder.fit_transform(test_y)
 
-    print(train_x.columns)
-
-
-    train_users = train_x.to_dict()
-    test_users = test_x.to_dict()
-
-    #print(train_x)
-
-    # separate data in train and test
-
     # save train and test set
+    with open('data/pickles/users.df.pkl', 'wb') as users_df_file:
+        pickle.dump(data_frame, users_df_file)
 
     with open('data/pickles/train.x.pkl', 'wb') as train_x_file:
         pickle.dump(train_x, train_x_file)
@@ -59,19 +59,19 @@ def main():
     with open('data/pickles/test.y.pkl', 'wb') as test_y_file:
         pickle.dump(test_y, test_y_file)
 
-
-    with open('data/pickles/train.users.pkl', 'wb') as train_users_file:
-        pickle.dump(train_users, train_users_file)
-
-    with open('data/pickles/test.users.pkl', 'wb') as test_users_file:
-        pickle.dump(test_users, test_users_file)
-
-
     with open('data/pickles/clean.users.pkl', 'wb') as clean_users_file:
         pickle.dump(users, clean_users_file)
 
-    with open('data/pickles/users.df.pkl', 'wb') as users_df_file:
-        pickle.dump(dataFrame, users_df_file)
+    # with open('data/pickles/train.users.pkl', 'wb') as train_users_file:
+    #     pickle.dump(train_users, train_users_file)
+    #
+    # with open('data/pickles/test.users.pkl', 'wb') as test_users_file:
+    #     pickle.dump(test_users, test_users_file)
+
+
+
+
+
 
 
     # print(users[0]["clean_text"], users[0]["tokens"])
@@ -137,6 +137,11 @@ def tokenize_text(text):
     text = text.lower()
     text = remove_stopwords(text)
     text = word_tokenize(text)
+    return text
+
+# text tiene que venir en tokens
+def pos_tag_text(text):
+    text = nltk.pos_tag(text)
     return text
 
 def remove_stopwords(text):

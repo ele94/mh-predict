@@ -10,11 +10,11 @@ def main():
 
     features = "train.df.feats"
 
-    #with open('data/pickles/train.feats.mod.pkl', 'rb') as train_feats_file:
-    #    train_x = pickle.load(train_feats_file)
-
-    with open('data/pickles/train_cfeats.pkl', 'rb') as train_feats_file:
+    with open('data/pickles/train.df.feats.pkl', 'rb') as train_feats_file:
         train_x = pickle.load(train_feats_file)
+
+    #with open('data/pickles/train_cfeats.pkl', 'rb') as train_feats_file:
+    #    train_x = pickle.load(train_feats_file)
 
     with open('data/pickles/train.y.pkl', 'rb') as train_y_file:
         train_labels = pickle.load(train_y_file)
