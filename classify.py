@@ -5,12 +5,17 @@ import pandas as pd
 
 def main():
 
-    #with open('data/pickles/test_cfeats.pkl', 'rb') as test_feats_file:
-    #    test_feats = pickle.load(test_feats_file)
+    combine = False
+
+    if combine:
+        features_file = 'data/pickles/test_cfeats.pkl'
+    else:
+        features_file = 'data/pickles/xtest.tfidf.word.pkl'
+
     with open('data/pickles/classifier.pkl', 'rb') as classifier_file:
         classifier = pickle.load(classifier_file)
 
-    with open('data/pickles/test.df.feats.pkl', 'rb') as test_feats_file:
+    with open(features_file, 'rb') as test_feats_file:
         test_feats = pickle.load(test_feats_file)
 
 
