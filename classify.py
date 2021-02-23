@@ -6,11 +6,16 @@ import pandas as pd
 def main():
 
     combine = False
+    tfidf = True
 
     if combine:
         features_file = 'data/pickles/test_cfeats.pkl'
+    elif tfidf:
+        features_file = "data/pickles/xtest.tfidf.ngram.pkl"
     else:
-        features_file = 'data/pickles/xtest.tfidf.word.pkl'
+        features_file = 'data/pickles/test.df.feats.pkl'
+
+    print(features_file)
 
     with open('data/pickles/classifier.pkl', 'rb') as classifier_file:
         classifier = pickle.load(classifier_file)

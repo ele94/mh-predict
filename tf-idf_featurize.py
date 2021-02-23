@@ -8,8 +8,8 @@ import pickle
 
 def main():
 
-    with open('data/pickles/users.df.pkl', 'rb') as users_df_file:
-        trainDF = pickle.load(users_df_file)
+    #with open('data/pickles/users.df.pkl', 'rb') as users_df_file:
+    #    trainDF = pickle.load(users_df_file)
 
     with open('data/pickles/train.x.pkl', 'rb') as train_x_file:
         train_x = pickle.load(train_x_file)
@@ -21,13 +21,13 @@ def main():
 
     # word level tf-idf
     tfidf_vect = TfidfVectorizer(analyzer='word', token_pattern=r'\w{1,}', max_features=5000)
-    tfidf_vect.fit(trainDF['clean_text'])
+    tfidf_vect.fit(train_x['clean_text'])
     xtrain_tfidf = tfidf_vect.transform(train_x["clean_text"])
     xtest_tfidf = tfidf_vect.transform(test_x["clean_text"])
 
     # ngram level tf-idf
     tfidf_vect_ngram = TfidfVectorizer(analyzer='word', token_pattern=r'\w{1,}', ngram_range=(2, 3), max_features=5000)
-    tfidf_vect_ngram.fit(trainDF['clean_text'])
+    tfidf_vect_ngram.fit(train_x['clean_text'])
     xtrain_tfidf_ngram = tfidf_vect_ngram.transform(train_x["clean_text"])
     xtest_tfidf_ngram = tfidf_vect_ngram.transform(test_x["clean_text"])
 
