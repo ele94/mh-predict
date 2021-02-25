@@ -26,19 +26,8 @@ def main():
     test_scores = load_pickle(score_file)
     test_x = load_pickle(test_x_file)
 
-    test_users = np.array(test_x[["user"]]).flatten()
-    test_scores = test_scores.tolist()
-    test_resuls = test_resuls.tolist()
-    test_users = test_users.tolist()
-
-    user_scores_tuples = list(zip(test_users, test_scores))
-    user_resul_tuples = list(zip(test_users, test_resuls))
-
-    print(user_scores_tuples[0:10])
-
-    user_resul = array_to_dict(user_resul_tuples)
-    user_scores = array_to_dict(user_scores_tuples)
-
+    user_resul = prepare_data(test_x, test_resuls)
+    user_scores = prepare_data(test_x, test_scores)
 
     test_resul_proc = process_decisions(user_resul, user_scores, window_size)
     eval_resuls = eval_performance(test_resul_proc, g_truth)
@@ -61,6 +50,20 @@ def write_csv(eval_resuls):
                 writer.writerow(data)
     except IOError:
         print("I/O error")
+
+
+
+def prepare_data(test_x, resul_array):
+
+    test_users = np.array(test_x[["user"]]).flatten()
+    resul_array = resul_array.tolist()
+    test_users = test_users.tolist()
+
+    user_tuples = list(zip(test_users, resul_array))
+    user_dict = array_to_dict(user_tuples)
+
+    return user_dict
+
 
 
 def array_to_dict(l):
