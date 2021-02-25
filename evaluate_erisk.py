@@ -13,16 +13,34 @@ test_data_path = "/home/elena/Documentos/UNED/erisk/2021/data/erisk2021_test_dat
 g_truth_filename = "golden_truth.txt"
 resul_file = "test.resul.pkl"
 score_file = "test.scores.pkl"
-erisk_eval_file = "erisk.eval.resuls.csv"
+test_x_file = "test.x.pkl"
+erisk_eval_file = "data/erisk.eval.resuls.csv"
 window_size = 5
+from pprint import pprint
+import numpy as np
 
 def main():
 
     g_truth = load_golden_truth(test_data_path, g_truth_filename)
     test_resuls = load_pickle(resul_file)
     test_scores = load_pickle(score_file)
+    test_x = load_pickle(test_x_file)
 
-    test_resul_proc = process_decisions(test_resuls, test_scores, window_size)
+    test_users = np.array(test_x[["user"]]).flatten()
+    test_scores = test_scores.tolist()
+    test_resuls = test_resuls.tolist()
+    test_users = test_users.tolist()
+
+    user_scores_tuples = list(zip(test_users, test_scores))
+    user_resul_tuples = list(zip(test_users, test_resuls))
+
+    print(user_scores_tuples[0:10])
+
+    user_resul = array_to_dict(user_resul_tuples)
+    user_scores = array_to_dict(user_scores_tuples)
+
+
+    test_resul_proc = process_decisions(user_resul, user_scores, window_size)
     eval_resuls = eval_performance(test_resul_proc, g_truth)
     print(eval_resuls)
 
@@ -44,6 +62,12 @@ def write_csv(eval_resuls):
     except IOError:
         print("I/O error")
 
+
+def array_to_dict(l):
+    d = dict()
+    [d[t[0]].append(t[1]) if t[0] in list(d.keys())
+     else d.update({t[0]: [t[1]]}) for t in l]
+    return d
 
 def process_decisions(user_decisions, user_scores, max_strategy=5):
     decision_list = []
