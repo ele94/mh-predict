@@ -9,6 +9,7 @@ Sequence:
 7. evaluate.py and/or erisk_evaluate.py
 
 
+With in/out files:
 
 1. prepare.py -> -> clean_train_users, clean_test_users
 2. clean_train_users, clean_test_users -> windowfy.py -> train_x, train_y, test_x, test_y
