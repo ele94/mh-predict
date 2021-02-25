@@ -1,3 +1,8 @@
+# trains the model
+
+# after: text_featurize.py / tfidf_featurize.py / combine_features.py
+# next: classify.py
+
 import pickle
 import nltk
 from sklearn.svm import LinearSVC
@@ -5,27 +10,19 @@ from sklearn.svm import SVC
 from sklearn import naive_bayes, ensemble
 import pandas as pd
 import numpy as np
+from utils import load_pickle
+from utils import save_pickle
+
+train_x_file = "train.feats.pkl"
+train_y_file = "train.y.pkl"
+classifier_file = "classifier.pkl"
 
 
 def main():
     strategy = 'balanced'  # TODO parametrizar
-    combine = False
-    tfidf = True
 
-    if combine:
-        features_file = 'data/pickles/train_cfeats.pkl'
-    elif tfidf:
-        features_file = "data/pickles/xtrain.tfidf.ngram.pkl"
-    else:
-        features_file = 'data/pickles/train.df.feats.pkl'
-
-    print(features_file)
-
-    with open(features_file, 'rb') as train_feats_file:
-        train_x = pickle.load(train_feats_file)
-
-    with open('data/pickles/train.y.pkl', 'rb') as train_y_file:
-        train_labels = pickle.load(train_y_file)
+    train_x = load_pickle(train_x_file)
+    train_labels = load_pickle(train_y_file)
 
 
     classifier = SVC(class_weight=strategy)
@@ -33,10 +30,12 @@ def main():
     #classifier = naive_bayes.MultinomialNB()
     #classifier = ensemble.RandomForestClassifier()
 
+    if train_x.isnull().values.any():
+        train_x = train_x.fillna(value=0,axis=0)
+
     classifier.fit(train_x, train_labels)
 
-    with open('data/pickles/classifier.pkl', 'wb') as classifier_file:
-        pickle.dump(classifier, classifier_file)
+    save_pickle(classifier_file, classifier)
 
 
 

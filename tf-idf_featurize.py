@@ -4,19 +4,23 @@ from sklearn import decomposition, ensemble
 
 import pandas, xgboost, numpy, textblob, string
 import pickle
+from utils import load_pickle
+from utils import save_pickle
+
+train_x_file = "train.x.pkl"
+test_x_file = "test.x.pkl"
+train_ngram_file = "train.tfidf.ngram.pkl"
+test_ngram_file = "test.tfidf.ngram.pkl"
+train_word_file = "train.tfidf.pkl"
+test_word_file = "test.tfidf.pkl"
+train_feats_file = "train.feats.pkl"
+test_feats_file = "test.feats.pkl"
 
 
 def main():
 
-    #with open('data/pickles/users.df.pkl', 'rb') as users_df_file:
-    #    trainDF = pickle.load(users_df_file)
-
-    with open('data/pickles/train.x.pkl', 'rb') as train_x_file:
-        train_x = pickle.load(train_x_file)
-
-    with open('data/pickles/test.x.pkl', 'rb') as test_x_file:
-        test_x = pickle.load(test_x_file)
-
+    train_x = load_pickle(train_x_file)
+    test_x = load_pickle(test_x_file)
 
 
     # word level tf-idf
@@ -31,16 +35,13 @@ def main():
     xtrain_tfidf_ngram = tfidf_vect_ngram.transform(train_x["clean_text"])
     xtest_tfidf_ngram = tfidf_vect_ngram.transform(test_x["clean_text"])
 
+    save_pickle(train_word_file, xtrain_tfidf)
+    save_pickle(test_word_file, xtest_tfidf)
+    save_pickle(train_ngram_file, xtrain_tfidf_ngram)
+    save_pickle(test_ngram_file, xtest_tfidf_ngram)
 
-    with open('data/pickles/xtrain.tfidf.word.pkl', 'wb') as xtrain_tfidf_file:
-        pickle.dump(xtrain_tfidf, xtrain_tfidf_file)
-    with open('data/pickles/xtest.tfidf.word.pkl', 'wb') as xtest_tfidf_file:
-        pickle.dump(xtest_tfidf, xtest_tfidf_file)
-
-    with open('data/pickles/xtrain.tfidf.ngram.pkl', 'wb') as xtrain_tfidf_file:
-        pickle.dump(xtrain_tfidf_ngram, xtrain_tfidf_file)
-    with open('data/pickles/xtest.tfidf.ngram.pkl', 'wb') as xtest_tfidf_file:
-        pickle.dump(xtest_tfidf_ngram, xtest_tfidf_file)
+    save_pickle(train_feats_file, xtrain_tfidf)
+    save_pickle(test_feats_file, xtest_tfidf)
 
 
 

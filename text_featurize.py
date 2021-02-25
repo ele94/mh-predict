@@ -1,6 +1,13 @@
+# calculates features related to text characteristics
+
+# after: windowfy.py
+# next: combine_features.py OR train.py
+
 import pickle
 import pandas as pd
 import numpy as np
+from utils import load_pickle
+from utils import save_pickle
 
 from sklearn import model_selection, preprocessing, linear_model, naive_bayes, metrics, svm
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
@@ -11,37 +18,36 @@ from sklearn.model_selection import train_test_split
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 nssi_corpus_path: str = "data/nssicorpus.txt"
+train_x_filename = "train.x.pkl"
+test_x_filename = "test.x.pkl"
+train_df_feats_filename = "train.df.feats.pkl"
+test_df_feats_filename = "test.df.feats.pkl"
+train_feats_filename = "train.feats.pkl"
+test_feats_filename = "test.feats.pkl"
+normalize_param = True
+
 
 def main():
 
-    normalize = True
+    train_x = load_pickle(train_x_filename)
+    test_x = load_pickle(test_x_filename)
 
-    #with open('data/pickles/test.users.pkl', 'rb') as test_users_file:
-    #    test_users = pickle.load(test_users_file)
-    #with open('data/pickles/train.users.pkl', 'rb') as train_users_file:
-    #    train_users = pickle.load(train_users_file)
+    print(train_x.isnull().values.any())
+    train_feats = create_features(train_x, normalize_param)
+    print(train_feats.isnull().values.any())
 
+    test_feats = create_features(test_x, normalize_param)
 
-    with open('data/pickles/train.x.pkl', 'rb') as train_df_file:
-        train_DF = pickle.load(train_df_file)
+    save_pickle(train_df_feats_filename, train_feats)
+    save_pickle(train_feats_filename, train_feats)
+    save_pickle(test_df_feats_filename, test_feats)
+    save_pickle(test_feats_filename, test_feats)
 
-    with open('data/pickles/test.x.pkl', 'rb') as test_df_file:
-        test_DF = pickle.load(test_df_file)
-
-
-    train_featsDF = create_features(train_DF, normalize)
-    test_featsDF = create_features(test_DF, normalize)
-
-    print(train_featsDF)
-
-    with open('data/pickles/train.df.feats.pkl', 'wb') as train_feats_file:
-        pickle.dump(train_featsDF, train_feats_file)
-
-    with open('data/pickles/test.df.feats.pkl', 'wb') as test_feats_file:
-        pickle.dump(test_featsDF, test_feats_file)
+    train_feats.to_csv(r'train_feats.csv')
+    test_feats.to_csv(r'test_feats.csv')
 
 
-def create_features(trainDF, normalize=True):
+def create_features(users_df, normalize=True):
 
     normalize_exceptions = ['char_count', 'word_density']
     exclude_features = ['char_count', 'word_count']
@@ -51,36 +57,36 @@ def create_features(trainDF, normalize=True):
     nssi_corpus = nssi_corpus.split('\n')
     nssi_corpus.remove('')
 
-    newFeats = pd.DataFrame()
+    new_feats = pd.DataFrame()
 
-    text_length = trainDF['clean_text'].map(len)
+    text_length = users_df['clean_text'].map(len)
     print(text_length)
 
-    newFeats['char_count'] = trainDF['clean_text'].map(len)
-    newFeats['word_count'] = trainDF['clean_text'].map(lambda x: len(x.split()))
-    newFeats['word_density'] = text_length / (text_length + 1)
+    new_feats['char_count'] = users_df['clean_text'].map(len)
+    new_feats['word_count'] = users_df['clean_text'].map(lambda x: len(x.split()))
+    new_feats['word_density'] = text_length / (text_length + 1)
 
-    newFeats['punctuation_count'] = trainDF['clean_text'].map(
+    new_feats['punctuation_count'] = users_df['clean_text'].map(
         lambda x: len("".join(_ for _ in x if _ in string.punctuation)))
-    newFeats['upper_case_count'] = trainDF['clean_text'].map(
+    new_feats['upper_case_count'] = users_df['clean_text'].map(
         lambda x: len([wrd for wrd in x.split() if wrd.isupper()]))
-
 
     #my old features:
     #text features
-    newFeats['questions_count'] = trainDF['text'].map(lambda x: len(re.findall(r'\?', x)))
-    newFeats['exclamations_count'] = trainDF['text'].map(lambda x: len(re.findall(r'\!', x)))
-    newFeats['smilies'] = trainDF['text'].map(lambda x: len(re.findall(r'\:\)+|\(+\:', x)))
-    newFeats['sad_faces'] = trainDF['text'].map(lambda x: len(re.findall(r'\:\(+|\)+\:', x)))
+    new_feats['questions_count'] = users_df['text'].map(lambda x: len(re.findall(r'\?', x)))
+    new_feats['exclamations_count'] = users_df['text'].map(lambda x: len(re.findall(r'\!', x)))
+    new_feats['smilies'] = users_df['text'].map(lambda x: len(re.findall(r'\:\)+|\(+\:', x)))
+    new_feats['sad_faces'] = users_df['text'].map(lambda x: len(re.findall(r'\:\(+|\)+\:', x)))
 
     reg = r'\bI\b|\bme\b|\bmine\b|\bmy\b|\bmyself\b'
-    newFeats['first_prons'] = trainDF['clean_text'].map(lambda x: len(re.findall(reg, x)))
+    new_feats['first_prons'] = users_df['clean_text'].map(lambda x: len(re.findall(reg, x)))
+    print(new_feats.isnull().values.any())
 
     sid = SentimentIntensityAnalyzer()
-    newFeats['sentiment'] = trainDF['clean_text'].map(lambda x: round(sid.polarity_scores(x)['compound'],2))
-
-    newFeats['nssi_words'] = trainDF['tokens'].map(lambda x: sum((' '.join(x)).count(word) for word in nssi_corpus))
-
+    new_feats['sentiment'] = users_df['clean_text'].map(lambda x: round(sid.polarity_scores(x)['compound'], 2))
+    print(new_feats.isnull().values.any())
+    new_feats['nssi_words'] = users_df['tokens'].map(lambda x: sum((' '.join(x)).count(word) for word in nssi_corpus))
+    print(new_feats.isnull().values.any())
     pos_family = {
         'noun': ['NN', 'NNS', 'NNP', 'NNPS'],
         'pron': ['PRP', 'PRP$', 'WP', 'WP$'],
@@ -96,60 +102,34 @@ def create_features(trainDF, normalize=True):
         count = len(test_list)
         return count
 
-    newFeats['noun_count'] = trainDF['pos_tags'].map(lambda x: check_pos_tag(x, 'noun'))
-    newFeats['pron_count'] = trainDF['pos_tags'].map(lambda x: check_pos_tag(x, 'pron'))
-    newFeats['verb_count'] = trainDF['pos_tags'].map(lambda x: check_pos_tag(x, 'verb'))
-    newFeats['adj_count'] = trainDF['pos_tags'].map(lambda x: check_pos_tag(x, 'adj'))
-    newFeats['adv_count'] = trainDF['pos_tags'].map(lambda x: check_pos_tag(x, 'adv'))
-
+    new_feats['noun_count'] = users_df['pos_tags'].map(lambda x: check_pos_tag(x, 'noun'))
+    new_feats['pron_count'] = users_df['pos_tags'].map(lambda x: check_pos_tag(x, 'pron'))
+    new_feats['verb_count'] = users_df['pos_tags'].map(lambda x: check_pos_tag(x, 'verb'))
+    new_feats['adj_count'] = users_df['pos_tags'].map(lambda x: check_pos_tag(x, 'adj'))
+    new_feats['adv_count'] = users_df['pos_tags'].map(lambda x: check_pos_tag(x, 'adv'))
+    print(new_feats.isnull().values.any())
 
     #normalize features by text length:
     #newFeats['word_count'] = newFeats['word_count'] / text_length
 
-    def normalize_feature(feature, normalizer):
-        return feature / normalizer
+    # def normalize_feature(feature, normalizer):
+    #     return feature / normalizer
 
+    print("Before normalizing", new_feats.isnull().values.any())
     if normalize:
-        for feature in newFeats.columns:
+        for feature in new_feats.columns:
             if feature not in normalize_exceptions:
-                newFeats[feature] = newFeats[feature] / text_length
+                new_feats[feature] = new_feats[feature] / text_length
 
+    print("After normalizing", new_feats.isnull().values.any())
 
     for feat in exclude_features:
-        newFeats.drop(feat, inplace=True, axis=1)
+        new_feats.drop(feat, inplace=True, axis=1)
 
     # new features ideas:
     # calcular la media de longitud de todos los usuarios en otro lado y ver las desviaciones
 
-    # pos_family = {
-    #     'noun': ['NN', 'NNS', 'NNP', 'NNPS'],
-    #     'pron': ['PRP', 'PRP$', 'WP', 'WP$'],
-    #     'verb': ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ'],
-    #     'adj': ['JJ', 'JJR', 'JJS'],
-    #     'adv': ['RB', 'RBR', 'RBS', 'WRB']
-    # }
-    #
-    # # function to check and get the part of speech tag count of a words in a given sentence
-    # def check_pos_tag(x, flag):
-    #     cnt = 0
-    #     try:
-    #         wiki = textblob.TextBlob(x)
-    #         for tup in wiki.tags:
-    #             ppo = list(tup)[1]
-    #             if ppo in pos_family[flag]:
-    #                 cnt += 1
-    #     except:
-    #         pass
-    #     return cnt
-    #
-    # trainDF['noun_count'] = trainDF['clean_text'].apply(lambda x: check_pos_tag(x, 'noun'))
-    # trainDF['verb_count'] = trainDF['clean_text'].apply(lambda x: check_pos_tag(x, 'verb'))
-    # trainDF['adj_count'] = trainDF['clean_text'].apply(lambda x: check_pos_tag(x, 'adj'))
-    # trainDF['adv_count'] = trainDF['clean_text'].apply(lambda x: check_pos_tag(x, 'adv'))
-    # trainDF['pron_count'] = trainDF['clean_text'].apply(lambda x: check_pos_tag(x, 'pron'))
-
-    print(newFeats.columns)
-    return newFeats
+    return new_feats
 
 
 

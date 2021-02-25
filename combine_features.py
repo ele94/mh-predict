@@ -7,35 +7,33 @@ from sklearn.feature_selection import SelectKBest
 import pickle
 from numpy import hstack
 import scipy
+from utils import load_pickle
+from utils import save_pickle
 
-with open('data/pickles/train.df.feats.pkl', 'rb') as train_feats_file:
-    train_word_feats = pickle.load(train_feats_file)
-
-with open('data/pickles/xtrain.tfidf.word.pkl', 'rb') as train_tfidf_file:
-    train_tfidf_feats = pickle.load(train_tfidf_file)
-
-with open('data/pickles/xtrain.tfidf.ngram.pkl', 'rb') as train_ngram_file:
-    train_ngram_feats = pickle.load(train_ngram_file)
-
-with open('data/pickles/test.df.feats.pkl', 'rb') as test_feats_file:
-    test_word_feats = pickle.load(test_feats_file)
-
-with open('data/pickles/xtest.tfidf.word.pkl', 'rb') as test_tfidf_file:
-    test_tfidf_feats = pickle.load(test_tfidf_file)
-
-with open('data/pickles/xtest.tfidf.ngram.pkl', 'rb') as test_ngram_file:
-    test_ngram_feats = pickle.load(test_ngram_file)
+train_df_feats_file = "train.df.feats.pkl"
+test_df_feats_file = "test.df.feats.pkl"
+train_ngram_file = "train.tfidf.ngram.pkl"
+test_ngram_file = "test.tfidf.ngram.pkl"
+train_word_file = "train.tfidf.pkl"
+test_word_file = "test.tfidf.pkl"
+train_combined_file = "train.cfeats.pkl"
+test_combined_file = "test.cfeats.pkl"
+train_feats_file = "train.feats.pkl"
+test_feats_file = "test.feats.pkl"
 
 
+train_text_feats = load_pickle(train_df_feats_file)
+test_text_feats = load_pickle(test_df_feats_file)
+train_tfidf_feats = load_pickle(train_word_file)
+test_tfidf_feats = load_pickle(test_word_file)
+train_ngram_feats = load_pickle(train_ngram_file)
+test_ngram_feats = load_pickle(test_ngram_file)
 
-train_combined_features = scipy.sparse.hstack((train_tfidf_feats,train_ngram_feats,train_word_feats))
 
-test_combined_features = scipy.sparse.hstack((test_tfidf_feats,test_ngram_feats,test_word_feats))
+train_combined_features = scipy.sparse.hstack((train_tfidf_feats,train_ngram_feats,train_text_feats))
+test_combined_features = scipy.sparse.hstack((test_tfidf_feats,test_ngram_feats,test_text_feats))
 
-
-
-with open('data/pickles/train_cfeats.pkl', 'wb') as train_combined_feats:
-    pickle.dump(train_combined_features, train_combined_feats)
-
-with open('data/pickles/test_cfeats.pkl', 'wb') as test_combined_feats:
-    pickle.dump(test_combined_features, test_combined_feats)
+save_pickle(train_combined_file, train_combined_features)
+save_pickle(test_combined_file, test_combined_features)
+save_pickle(train_feats_file, train_combined_features)
+save_pickle(test_feats_file, test_combined_features)

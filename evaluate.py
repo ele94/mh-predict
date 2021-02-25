@@ -1,28 +1,26 @@
+# normal classification evaluation
 
-# todo pasar desde la libreta classify.py!!!
-import pickle
+# comes after classify.py
+
 from sklearn.metrics import precision_recall_curve
 import sklearn.metrics as metrics
+from utils import load_pickle
+from utils import save_pickle
+import numpy
 
-#with open('data/pickles/test.labels.mod.pkl', 'rb') as test_labels_file:
-#    test_labels = pickle.load(test_labels_file)
+test_y_file = "test.y.pkl"
+resul_file = "test.resul.pkl"
 
-with open('data/pickles/test.y.pkl', 'rb') as test_y_file:
-    test_labels = pickle.load(test_y_file)
+labels = load_pickle(test_y_file)
+predictions = load_pickle(resul_file)
 
-#with open('data/pickles/test.resul.pkl', 'rb') as test_resul_file:
-#    test_resul = pickle.load(test_resul_file)
+classification_report = metrics.classification_report(labels, predictions)
+confusion_matrix = metrics.confusion_matrix(labels, predictions)
+accuracy_score = metrics.accuracy_score(predictions, labels)
 
-with open('data/pickles/test.resul.mod.pkl', 'rb') as test_resul_mod_file:
-    predictions = pickle.load(test_resul_mod_file)
-
-
-
-#predictions = test_resul
-labels = test_labels
-
-print(metrics.classification_report(labels, predictions))
-
-print(metrics.confusion_matrix(labels, predictions))
-
-print(metrics.accuracy_score(predictions, labels))
+print(classification_report)
+numpy.savetxt('data/Metrics.txt', classification_report)
+print(confusion_matrix)
+numpy.savetxt('data/Confusion_matrix.txt', confusion_matrix)
+print(accuracy_score)
+numpy.savetxt('data/Accuracy_score.txt', accuracy_score)

@@ -1,3 +1,9 @@
+# prepare adapted to erisk 2021, where train and test came separated
+# cleaning done to the data in dictionary form, and saved as dictionary
+
+# this is the beginning
+# next: windowfy,py
+
 from abc import abstractmethod
 import pickle, os
 import xml.etree.ElementTree as ET
@@ -9,79 +15,49 @@ import re, itertools
 from nltk.corpus import stopwords
 import pandas as pd
 from sklearn import model_selection, preprocessing
+from utils import load_pickle
+from utils import save_pickle
+
+train_data_path = "/home/elena/Documentos/UNED/erisk/2021/data/erisk2021_training_data"
+test_data_path = "/home/elena/Documentos/UNED/erisk/2021/data/erisk2021_test_data"
 
 def main():
 
-    # load data (already joined) and golden truth
-    g_truth = load_golden_truth("data", "2019_golden_truth.txt")
-    users = load_user_data("data/user_data", g_truth)
+    g_truth_train = load_golden_truth(train_data_path, "golden_truth.txt")
+    g_truth_test = load_golden_truth(test_data_path, "golden_truth.txt")
 
-    # clean data
-    for user in users:
-        user["clean_text"] = clean_text(user["text"])
+    train_users = load_user_data(train_data_path, "data", g_truth_train)
+    test_users = load_user_data(test_data_path, "data", g_truth_test)
 
-    # tokenize, stem and pos??? de momento solo tokenize
-    for user in users:
-        user["tokens"] = tokenize_text(user["clean_text"])
+    train_users = preprocess_data(train_users)
+    test_users = preprocess_data(test_users)
 
-    # pos tambien
-    for user in users:
-        user["pos_tags"] = pos_tag_text(user["tokens"])
+    print(train_users[list(train_users.keys())[0]])
 
-
-    print(users[0])
-
-    # convert to dataFrame, and choose which columns to conserve
-    data_frame = pd.DataFrame(users)
-    print(data_frame.columns)
-
-    # separate data in train and test
-    train_x, test_x, train_y, test_y = train_test_split(data_frame[["user", "date", "text", "title", "clean_text",
-                                                                    "tokens", "pos_tags"]], data_frame['g_truth'], test_size=0.33)
-    # label encode the target variable (I think this is not necessary?)
-    encoder = preprocessing.LabelEncoder()
-    train_y = encoder.fit_transform(train_y)
-    test_y = encoder.fit_transform(test_y)
-
-    # save train and test set
-    with open('data/pickles/users.df.pkl', 'wb') as users_df_file:
-        pickle.dump(data_frame, users_df_file)
-
-    with open('data/pickles/train.x.pkl', 'wb') as train_x_file:
-        pickle.dump(train_x, train_x_file)
-
-    with open('data/pickles/train.y.pkl', 'wb') as train_y_file:
-        pickle.dump(train_y, train_y_file)
-
-    with open('data/pickles/test.x.pkl', 'wb') as test_x_file:
-        pickle.dump(test_x, test_x_file)
-
-    with open('data/pickles/test.y.pkl', 'wb') as test_y_file:
-        pickle.dump(test_y, test_y_file)
-
-    with open('data/pickles/clean.users.pkl', 'wb') as clean_users_file:
-        pickle.dump(users, clean_users_file)
-
-    # with open('data/pickles/train.users.pkl', 'wb') as train_users_file:
-    #     pickle.dump(train_users, train_users_file)
-    #
-    # with open('data/pickles/test.users.pkl', 'wb') as test_users_file:
-    #     pickle.dump(test_users, test_users_file)
+    save_pickle("clean.train.users.pkl", train_users)
+    save_pickle("clean.test.users.pkl", test_users)
 
 
 
 
 
+# cleans text, creates tokens and applies pos_tags
+def preprocess_data(users):
+    preproc_users = {}
+    for user, writings in users.items():
+        preproc_writings = []
+        for writing in writings:
+            writing["clean_text"] = clean_text(writing["text"])
+            if len(writing["clean_text"]) == 0:
+                print("Text less than 0: ", writing["text"])
+            writing["tokens"] = tokenize_text(writing["clean_text"])
+            writing["pos_tags"] = pos_tag_text(writing["tokens"])
+            preproc_writings.append(writing)
+
+        preproc_users[user] = preproc_writings
 
 
-    # print(users[0]["clean_text"], users[0]["tokens"])
-    #
-
-
-
-
-
-
+    return preproc_users
 
 
 
@@ -92,8 +68,10 @@ def load_golden_truth(path, filename):
 
 
 # loads data already joined. for other methods, look erisk project
-def load_user_data(path, g_truth):
-    users = []
+def load_user_data(dir_path, dir_name, g_truth):
+    users = {}
+
+    path = os.path.join(dir_path, dir_name)
 
     for filename in os.listdir(path):
 
@@ -102,35 +80,45 @@ def load_user_data(path, g_truth):
         tree = ET.parse(os.path.join(path, filename))
         root = tree.getroot()
 
-        user_writings = {"user": user, "g_truth": g_truth[user], "date": [], "text": [], "title": []}
+        user_writings = []
 
         for writing in root.findall('WRITING'):
             title, text, date = "", "", ""
             if writing.find('TITLE') is not None:
                 title = writing.find('TITLE').text
+                if title is None:
+                    title = ""
             if writing.find('TEXT') is not None:
                 text = writing.find('TEXT').text
+                if text is None:
+                    text = ""
             if writing.find('DATE') is not None:
                 date = writing.find('DATE').text
+                if date is None:
+                    date = ""
 
-            user_writings['date'].append(date)
-            user_writings['title'].append(title)
-            user_writings['text'].append(title)
-            user_writings['text'].append(text)
+            if len(title) > 0:
+                user_writing = {"user": user, "g_truth": g_truth[user], "date": date, "text": title + ". " + text, "title": title}
+            else:
+                user_writing = {"user": user, "g_truth": g_truth[user], "date": date, "text": text, "title": title}
+            user_writings.append(user_writing)
 
-        user_writings['text'] = '.'.join(user_writings['text'])
-        users.append(user_writings)
+        users[user] = user_writings
 
     return users
 
 
-def clean_text(text):
-    text = text.strip()
-    text = re.sub(r'https?:\/\/.*[\r\n]*', '', text, flags=re.MULTILINE)
+def clean_text(old_text):
+
+    text = old_text.strip()
+    text = re.sub(r'(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])?', 'URL', text, flags=re.MULTILINE)
     text = re.sub(r' #[0-9]+;', '', text)
     text = re.sub(r"[^\w\d'\s]+", ' ', text)
     text = re.sub('  ', ' ', text)
     text = contractions.fix(text)  # NEW!!!!
+    if len(text) <= 0:
+        print("Text less than 0", "old text:" , old_text, "new text:",  text)
+        text = "0"
     return text
 
 def tokenize_text(text):
