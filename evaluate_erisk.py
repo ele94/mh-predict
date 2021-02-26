@@ -40,17 +40,23 @@ def main():
 
 
 def write_csv(eval_resuls):
+
+    data = {}
+    now = datetime.now()
+    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+    data["timestamp"] = dt_string
+
+
     params = load_parameters()
+    data.update(params)
+    data.update(eval_resuls)
+
     csv_file = erisk_eval_file
 
     print("eval params: {}".format(params))
-    print("eval resuls: {}".format(eval_resuls))
 
-    now = datetime.now()
-    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-    params["timestamp"] = dt_string
-    csv_columns = params.keys()
-    dict_data = [params]
+    csv_columns = data.keys()
+    dict_data = [data]
 
     try:
         with open(csv_file, 'a') as csvfile:
@@ -63,16 +69,6 @@ def write_csv(eval_resuls):
 
     csv_columns = eval_resuls.keys()
     dict_data = [eval_resuls]
-
-    try:
-        with open(csv_file, 'a') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
-            writer.writeheader()
-            for data in dict_data:
-                writer.writerow(data)
-    except IOError:
-        print("I/O error")
-
 
 
 
