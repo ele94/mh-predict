@@ -1,19 +1,53 @@
 import os
 import pickle
+import yaml
 
-path = "data/pickles"
+params_file = "params.yaml"
+pickles_path = "data/pickles"
+
+######### pickles
+
 
 def save_pickle(filename, data):
-    file = os.path.join(path, filename)
+    file = os.path.join(pickles_path, filename)
     with open(file, 'wb') as data_file:
         pickle.dump(data, data_file)
 
 
 def load_pickle(filename):
-    file = os.path.join(path, filename)
+    file = os.path.join(pickles_path, filename)
     with open(file, 'rb') as data_file:
         data = pickle.load(data_file)
     return data
+
+######## parameters
+
+
+def load_parameters():
+    with open(params_file) as f:
+        params = yaml.load(f, Loader=yaml.FullLoader)
+        print(params)
+    return params
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########## erisk evaluation
+
+
 
 def penalty(delay):
     import numpy as np

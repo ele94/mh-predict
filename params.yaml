@@ -1,0 +1,3 @@
+feats_window_size: 1  #default: 1
+eval_window_size: 1  #default: 5
+max_features: 5000   #default: 5000

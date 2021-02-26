@@ -14,12 +14,15 @@ g_truth_filename = "golden_truth.txt"
 resul_file = "test.resul.pkl"
 score_file = "test.scores.pkl"
 test_x_file = "test.x.pkl"
-erisk_eval_file = "data/erisk.eval.resuls.csv"
-window_size = 5
+erisk_eval_file = "erisk.eval.resuls.csv"
 from pprint import pprint
 import numpy as np
+from utils import load_parameters
+from datetime import datetime
 
 def main():
+
+    window_size = load_parameters()["eval_window_size"]
 
     g_truth = load_golden_truth(test_data_path, g_truth_filename)
     test_resuls = load_pickle(resul_file)
@@ -37,19 +40,41 @@ def main():
 
 
 def write_csv(eval_resuls):
-    print("eval resuls: {}".format(eval_resuls))
-    csv_columns = eval_resuls.keys()
+    params = load_parameters()
     csv_file = erisk_eval_file
-    dict_data = [eval_resuls]
+
+    print("eval params: {}".format(params))
+    print("eval resuls: {}".format(eval_resuls))
+
+    now = datetime.now()
+    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+    params["timestamp"] = dt_string
+    csv_columns = params.keys()
+    dict_data = [params]
 
     try:
-        with open(csv_file, 'w') as csvfile:
+        with open(csv_file, 'a') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
             writer.writeheader()
             for data in dict_data:
                 writer.writerow(data)
     except IOError:
         print("I/O error")
+
+    csv_columns = eval_resuls.keys()
+    dict_data = [eval_resuls]
+
+    try:
+        with open(csv_file, 'a') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+            writer.writeheader()
+            for data in dict_data:
+                writer.writerow(data)
+    except IOError:
+        print("I/O error")
+
+
+
 
 
 
