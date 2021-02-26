@@ -13,16 +13,16 @@ import numpy as np
 from utils import load_pickle
 from utils import save_pickle
 
-train_x_file = "train.feats.pkl"
-train_y_file = "train.y.pkl"
+train_feats_file = "train.feats.pkl"
+train_labels_file = "train.y.pkl"
 classifier_file = "classifier.pkl"
 
 
 def main():
     strategy = 'balanced'  # TODO parametrizar
 
-    train_x = load_pickle(train_x_file)
-    train_labels = load_pickle(train_y_file)
+    train_feats = load_pickle(train_feats_file)
+    train_labels = load_pickle(train_labels_file)
 
 
     classifier = SVC(class_weight=strategy)
@@ -30,10 +30,10 @@ def main():
     #classifier = naive_bayes.MultinomialNB()
     #classifier = ensemble.RandomForestClassifier()
 
-    if train_x.isnull().values.any():
-        train_x = train_x.fillna(value=0,axis=0)
+    # if train_feats.isnull().values.any():
+    #     train_feats = train_feats.fillna(value=0,axis=0)
 
-    classifier.fit(train_x, train_labels)
+    classifier.fit(train_feats, train_labels)
 
     save_pickle(classifier_file, classifier)
 
