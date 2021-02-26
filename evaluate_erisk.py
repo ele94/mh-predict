@@ -61,7 +61,8 @@ def write_csv(eval_resuls):
     try:
         with open(csv_file, 'a') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
-            writer.writeheader()
+            if os.path.getsize(csv_file) == 0:
+                writer.writeheader()
             for data in dict_data:
                 writer.writerow(data)
     except IOError:
