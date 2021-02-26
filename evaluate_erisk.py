@@ -19,6 +19,7 @@ from pprint import pprint
 import numpy as np
 from utils import load_parameters
 from datetime import datetime
+import subprocess
 
 def main():
 
@@ -42,6 +43,8 @@ def main():
 def write_csv(eval_resuls):
 
     data = {}
+    data["commit hash"] = subprocess.check_output(["git", "describe", "--always"]).strip().decode()
+
     now = datetime.now()
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     data["timestamp"] = dt_string
