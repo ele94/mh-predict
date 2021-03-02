@@ -20,15 +20,23 @@ def load_pickle(filename):
         data = pickle.load(data_file)
     return data
 
+
+def remove_pickle(filename):
+    file = os.path.join(pickles_path, filename)
+    if os.path.exists(file):
+        os.remove(file)
+
 ######## parameters
 
 
 def load_parameters():
     with open(params_file) as f:
         params = yaml.load(f, Loader=yaml.FullLoader)
-        print(params)
     return params
 
+def update_parameters(params):
+    with open(params_file, 'w') as f:
+        yaml.safe_dump(params, f, default_flow_style=False)
 
 
 

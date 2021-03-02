@@ -13,6 +13,7 @@ import numpy as np
 from utils import load_pickle
 from utils import save_pickle
 from utils import load_parameters
+from utils import remove_pickle
 import xgboost
 
 train_feats_file = "train.feats.pkl"
@@ -23,6 +24,8 @@ classifier_file = "classifier.pkl"
 def main():
     strategy = load_parameters()["strategy"]
     classifier_name = load_parameters()["classifier"]
+
+    remove_pickle(classifier_file)
 
     train_feats = load_pickle(train_feats_file)
     train_labels = load_pickle(train_labels_file)

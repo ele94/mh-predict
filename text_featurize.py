@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 from utils import load_pickle
 from utils import save_pickle
+from utils import remove_pickle
 
 from sklearn import model_selection, preprocessing, linear_model, naive_bayes, metrics, svm
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
@@ -29,6 +30,9 @@ normalize_param = True
 
 def main():
 
+    remove_pickle(train_df_feats_filename)
+    remove_pickle(test_df_feats_filename)
+
     train_x = load_pickle(train_x_filename)
     test_x = load_pickle(test_x_filename)
 
@@ -41,8 +45,8 @@ def main():
     save_pickle(train_df_feats_filename, train_feats)
     save_pickle(test_df_feats_filename, test_feats)
 
-    train_feats.to_csv(r'train_feats.csv')
-    test_feats.to_csv(r'test_feats.csv')
+    #train_feats.to_csv(r'train_feats.csv')
+    #test_feats.to_csv(r'test_feats.csv')
 
 
 def create_features(users_df, normalize=True):

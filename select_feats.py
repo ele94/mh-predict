@@ -1,5 +1,6 @@
 from utils import load_pickle
 from utils import save_pickle
+from utils import remove_pickle
 from utils import load_parameters
 
 train_df_feats_file = "train.df.feats.pkl"
@@ -18,6 +19,8 @@ def main():
     params = load_parameters()
     param = params["feats"]
 
+    remove_pickle(train_feats_file)
+    remove_pickle(test_feats_file)
 
     # change here
     if param == "text":

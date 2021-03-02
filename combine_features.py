@@ -9,6 +9,7 @@ from numpy import hstack
 import scipy
 from utils import load_pickle
 from utils import save_pickle
+from utils import remove_pickle
 from utils import load_parameters
 
 train_df_feats_file = "train.df.feats.pkl"
@@ -24,16 +25,20 @@ test_feats_file = "test.feats.pkl"
 
 
 def main():
+
+    remove_pickle(train_combined_file)
+    remove_pickle(test_combined_file)
+
     train_text_feats = load_pickle(train_df_feats_file)
     test_text_feats = load_pickle(test_df_feats_file)
     train_tfidf_feats = load_pickle(train_word_file)
     test_tfidf_feats = load_pickle(test_word_file)
-    train_ngram_feats = load_pickle(train_ngram_file)
-    test_ngram_feats = load_pickle(test_ngram_file)
+    # train_ngram_feats = load_pickle(train_ngram_file)
+    # test_ngram_feats = load_pickle(test_ngram_file)
 
 
-    train_combined_features = scipy.sparse.hstack((train_tfidf_feats,train_ngram_feats,train_text_feats))
-    test_combined_features = scipy.sparse.hstack((test_tfidf_feats,test_ngram_feats,test_text_feats))
+    train_combined_features = scipy.sparse.hstack((train_tfidf_feats,train_text_feats))
+    test_combined_features = scipy.sparse.hstack((test_tfidf_feats,test_text_feats))
 
     save_pickle(train_combined_file, train_combined_features)
     save_pickle(test_combined_file, test_combined_features)

@@ -14,6 +14,7 @@ import itertools
 from sklearn import preprocessing
 from utils import load_pickle
 from utils import save_pickle
+from utils import remove_pickle
 from utils import load_parameters
 
 train_filename = "clean.train.users.pkl"
@@ -25,6 +26,12 @@ test_y_filename = "test.y.pkl"
 
 
 def main():
+
+    remove_pickle(train_x_filename)
+    remove_pickle(test_x_filename)
+    remove_pickle(train_y_filename)
+    remove_pickle(test_y_filename)
+
     train_users = load_pickle(train_filename)
     test_users = load_pickle(test_filename)
 
