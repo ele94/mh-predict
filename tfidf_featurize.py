@@ -43,9 +43,6 @@ def main():
     save_pickle(train_ngram_file, xtrain_tfidf_ngram)
     save_pickle(test_ngram_file, xtest_tfidf_ngram)
 
-    save_pickle(train_feats_file, xtrain_tfidf)
-    save_pickle(test_feats_file, xtest_tfidf)
-
 
 
 if __name__ == '__main__':

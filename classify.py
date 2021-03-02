@@ -9,6 +9,7 @@ import pandas as pd
 
 from utils import load_pickle
 from utils import save_pickle
+from utils import load_parameters
 
 test_x_file = "test.feats.pkl"
 test_y_file = "test.y.pkl"
@@ -22,7 +23,8 @@ def main():
     test_x = load_pickle(test_x_file)
 
     #test_resul = classifier.classify_many(test_feats)
-
+    if not load_parameters()["feats"] == "text":
+        test_x = test_x.tocsc()
     predictions = classifier.predict(test_x)
     scores = predictions #todo fix this!!!
 

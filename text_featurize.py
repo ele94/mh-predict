@@ -39,9 +39,7 @@ def main():
     test_feats = create_features(test_x, normalize_param)
 
     save_pickle(train_df_feats_filename, train_feats)
-    save_pickle(train_feats_filename, train_feats)
     save_pickle(test_df_feats_filename, test_feats)
-    save_pickle(test_feats_filename, test_feats)
 
     train_feats.to_csv(r'train_feats.csv')
     test_feats.to_csv(r'test_feats.csv')

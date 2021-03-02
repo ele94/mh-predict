@@ -29,7 +29,7 @@ def main():
     test_users = load_pickle(test_filename)
 
     window_type = "count"  # (count, size or time)
-    window_size = load_parameters()["feat_window_size"]
+    window_size = load_parameters()["feats_window_size"]
 
     train_window = windowfy_sliding(train_users, window_size)
     test_window = windowfy_sliding(test_users, window_size)
