@@ -40,7 +40,6 @@ def main():
 
     test_resul_proc = process_decisions(user_resul, user_scores, window_size)
     eval_resuls = eval_performance(test_resul_proc, g_truth)
-    print(eval_resuls)
 
     write_csv(eval_resuls)
 
@@ -60,8 +59,6 @@ def write_csv(eval_resuls):
     data.update(eval_resuls)
 
     csv_file = erisk_eval_file
-
-    print("eval params: {}".format(params))
 
     csv_columns = data.keys()
     dict_data = [data]
@@ -126,12 +123,8 @@ def process_decisions(user_decisions, user_scores, max_strategy=5):
                 new_user_decisions[user].append(0)
                 new_user_sequence[user].append(i)
             elif count >= max:
-                print("Count max: {}".format(count))
                 new_user_decisions[user].append(1)
                 new_user_sequence[user].append(new_user_sequence[user][i-1])
-        print("Count: {}".format(count))
-        print("Length of user decisions: {}".format(len(decisions)))
-        print("Length of new user decisions: {}".format(len(new_user_decisions[user])))
 
     # lo montamos en el formato que acepta el evaluador
     for user, decisions in new_user_decisions.items():

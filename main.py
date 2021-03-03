@@ -18,7 +18,7 @@ from utils import check_pickle
 
 last_experiment = {}
 
-def test(params, last_params):
+def test(params):
 
     # if last_params["feats_window_size"] != params["feats_window_size"]:
     #     experiment = ["windowfy", "featurize", "select_feats", "train",
@@ -88,8 +88,8 @@ def test(params, last_params):
         print("Classifying")
         classify()
 
-    print("Evaluating")
-    evaluate()
+    #print("Evaluating")
+    #evaluate()
     print("Evaluating erisk")
     eval_erisk()
 
@@ -127,8 +127,8 @@ def experiments():
 
     params = load_parameters()
 
-    feats_window_sizes = [1, 10, 20]
-    eval_window_sizes = [1, 3, 5, 10]
+    feats_window_sizes = [1, 10, 20, 50, 100]
+    eval_window_sizes = [1, 3, 5]
     #max_features = [1000, 2000, 5000]
     feats = ["text", "tfidf", "combined"]
     classifiers = ["svm", "linear_svm", "forest", "xgboost"]
@@ -142,34 +142,39 @@ def experiments():
     params["classifier"] = "svm"
     update_parameters(params)
 
+    experiments = []
+
     for feats_window_size in feats_window_sizes:
+        params["feats_window_size"] = feats_window_size
         for feat in feats:
+            params["feats"] = feat
             for classifier in classifiers:
+                params["classifier"] = classifier
                 for eval_window_size in eval_window_sizes:
                     params["eval_window_size"] = eval_window_size
-                    last_params = do_experiment(params, last_params)
-                params["classifier"] = classifier
-                last_params = do_experiment(params, last_params)
-            params["feats"] = feat
-            last_params = do_experiment(params, last_params)
-        params["feats_window_size"] = feats_window_size
-        last_params = do_experiment(params, last_params)
+                    experiments.append(params.copy())
+                experiments.append(params.copy())
+            experiments.append(params.copy())
+        experiments.append(params.copy())
+
+    for experiment in experiments:
+        do_experiment(experiment.copy())
 
     print("ENDED EXPERIMENTS")
     # want to test all combinations
 
-def do_experiment(params, last_params):
-    if params not in params_history:
-        params_history.append(params.copy())
-        update_parameters(params)
+
+def do_experiment(experiment_params):
+    if experiment_params not in params_history:
+        params_history.append(experiment_params.copy())
+        update_parameters(experiment_params.copy())
         try:
-            last_params = test(params, last_params)
+            test(experiment_params.copy())
         except Exception as e:
-            print("failed params:{}".format(params))
+            print("failed params:{}".format(experiment_params))
             print("Exception: {}".format(e))
     else:
-        print("Skipping duplicated params {}".format(params))
-    return last_params.copy()
+        print("Skipping duplicated params {}".format(experiment_params))
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
