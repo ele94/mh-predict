@@ -78,12 +78,12 @@ def test(params, last_params):
         print("Combining features")
         combine_features()
 
-    classifier_file = str(params["feats_window_size"]) + "." + params["classifier"] + ".pkl"
+    classifier_file = str(params["feats_window_size"]) + "." + params["feats"] + "." + params["classifier"] + ".pkl"
     if not check_pickle(classifier_file):
         print("Training")
         train()
 
-    resuls_file = str(params["feats_window_size"]) + "." + params["classifier"] + ".test.resul.pkl"
+    resuls_file = str(params["feats_window_size"]) + "." + params["feats"] + "." + params["classifier"] + ".test.resul.pkl"
     if not check_pickle(resuls_file):
         print("Classifying")
         classify()

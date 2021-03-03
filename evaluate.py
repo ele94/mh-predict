@@ -10,12 +10,14 @@ from utils import load_parameters
 import numpy
 
 test_y_filename = "test.y.pkl"
-resul_file = "test.resul.pkl"
+resul_filename = "test.resul.pkl"
 
 def main():
 
     params = load_parameters()
     test_y_file = str(params["feats_window_size"]) + "." + test_y_filename
+    resul_file = str(params["feats_window_size"]) + "." + params["feats"] + "." + params[
+        "classifier"] + "." + resul_filename
 
     labels = load_pickle(test_y_file)
     predictions = load_pickle(resul_file)

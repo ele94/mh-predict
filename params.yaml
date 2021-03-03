@@ -1,6 +1,7 @@
-feats_window_size: 10  #default: 1
-eval_window_size: 1  #default: 5
-max_features: 5000   #default: 5000
-feats: "text"  #text, tfidf, ngram, combined
-classifier: "xgboost" #svm, linear_svm, forest, xgboost, bayes
-strategy: "balanced"
+classifier: xgboost
+eval_window_size: 10
+feats: combined
+feats_window_size: 20
+max_features: 5000
+range_max: 100
+strategy: balanced
