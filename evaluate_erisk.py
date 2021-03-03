@@ -11,8 +11,8 @@ from utils import save_pickle
 
 test_data_path = "/home/elena/Documentos/UNED/erisk/2021/data/erisk2021_test_data"
 g_truth_filename = "golden_truth.txt"
-resul_file = "test.resul.pkl"
-score_file = "test.scores.pkl"
+resul_filename = "test.resul.pkl"
+score_filename = "test.scores.pkl"
 test_x_file = "test.x.pkl"
 erisk_eval_file = "erisk.eval.resuls.csv"
 from pprint import pprint
@@ -22,6 +22,11 @@ from datetime import datetime
 import subprocess
 
 def main():
+
+    params = load_parameters()
+
+    resul_file = str(params["feats_window_size"]) + "." + params["feats"] + "." + params["classifier"] + "." + resul_filename
+    score_file = str(params["feats_window_size"]) + "." + params["feats"] + "." + params["classifier"] + "." + score_filename
 
     window_size = load_parameters()["eval_window_size"]
 
@@ -116,13 +121,17 @@ def process_decisions(user_decisions, user_scores, max_strategy=5):
                 count = 0
                 new_user_decisions[user].append(0)
                 new_user_sequence[user].append(i)
-            if decisions[i] == 1 and count < max:
+            elif decisions[i] == 1 and count < max:
                 count = count +1
                 new_user_decisions[user].append(0)
                 new_user_sequence[user].append(i)
-            if count >= max:
+            elif count >= max:
+                print("Count max: {}".format(count))
                 new_user_decisions[user].append(1)
                 new_user_sequence[user].append(new_user_sequence[user][i-1])
+        print("Count: {}".format(count))
+        print("Length of user decisions: {}".format(len(decisions)))
+        print("Length of new user decisions: {}".format(len(new_user_decisions[user])))
 
     # lo montamos en el formato que acepta el evaluador
     for user, decisions in new_user_decisions.items():

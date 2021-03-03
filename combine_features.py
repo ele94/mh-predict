@@ -12,27 +12,28 @@ from utils import save_pickle
 from utils import remove_pickle
 from utils import load_parameters
 
-train_df_feats_file = "train.df.feats.pkl"
-test_df_feats_file = "test.df.feats.pkl"
-train_ngram_file = "train.tfidf.ngram.pkl"
-test_ngram_file = "test.tfidf.ngram.pkl"
-train_word_file = "train.tfidf.pkl"
-test_word_file = "test.tfidf.pkl"
-train_combined_file = "train.cfeats.pkl"
-test_combined_file = "test.cfeats.pkl"
-train_feats_file = "train.feats.pkl"
-test_feats_file = "test.feats.pkl"
+train_df_feats_file = "text.train.pkl"
+test_df_feats_file = "text.test.pkl"
+train_word_file = "tfidf.train.pkl"
+test_word_file = "tfidf.test.pkl"
+train_combined_file = "combined.train.pkl"
+test_combined_file = "combined.test.pkl"
+train_feats_file = "train.pkl"
+test_feats_file = "test.pkl"
 
 
 def main():
 
+    params = load_parameters()
+    file_params = str(params["feats_window_size"]) + "."
+
     remove_pickle(train_combined_file)
     remove_pickle(test_combined_file)
 
-    train_text_feats = load_pickle(train_df_feats_file)
-    test_text_feats = load_pickle(test_df_feats_file)
-    train_tfidf_feats = load_pickle(train_word_file)
-    test_tfidf_feats = load_pickle(test_word_file)
+    train_text_feats = load_pickle(file_params+train_df_feats_file)
+    test_text_feats = load_pickle(file_params+test_df_feats_file)
+    train_tfidf_feats = load_pickle(file_params+train_word_file)
+    test_tfidf_feats = load_pickle(file_params+test_word_file)
     # train_ngram_feats = load_pickle(train_ngram_file)
     # test_ngram_feats = load_pickle(test_ngram_file)
 
@@ -40,8 +41,8 @@ def main():
     train_combined_features = scipy.sparse.hstack((train_tfidf_feats,train_text_feats))
     test_combined_features = scipy.sparse.hstack((test_tfidf_feats,test_text_feats))
 
-    save_pickle(train_combined_file, train_combined_features)
-    save_pickle(test_combined_file, test_combined_features)
+    save_pickle(file_params + train_combined_file, train_combined_features)
+    save_pickle(file_params + test_combined_file, test_combined_features)
 
 
 

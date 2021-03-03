@@ -12,18 +12,18 @@ import os
 
 train_x_file = "train.x.pkl"
 test_x_file = "test.x.pkl"
-train_ngram_file = "train.tfidf.ngram.pkl"
-test_ngram_file = "test.tfidf.ngram.pkl"
-train_word_file = "train.tfidf.pkl"
-test_word_file = "test.tfidf.pkl"
-train_feats_file = "train.feats.pkl"
-test_feats_file = "test.feats.pkl"
+train_feats_file = "tfidf.train.pkl"
+test_feats_file = "tfidf.test.pkl"
 
 
 def main():
 
-    remove_pickle(train_ngram_file)
-    remove_pickle(test_ngram_file)
+    params = load_parameters()
+    window_size = params["feats_window_size"]
+
+    train_word_file = str(window_size) + "." + train_feats_file
+    test_word_file = str(window_size) + "." + test_feats_file
+
     remove_pickle(train_word_file)
     remove_pickle(test_word_file)
 

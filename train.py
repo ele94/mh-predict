@@ -16,14 +16,20 @@ from utils import load_parameters
 from utils import remove_pickle
 import xgboost
 
-train_feats_file = "train.feats.pkl"
-train_labels_file = "train.y.pkl"
-classifier_file = "classifier.pkl"
+train_feats_filename = "train.pkl"
+train_labels_filename = "train.y.pkl"
+#classifier_file = "classifier.pkl"
 
 
 def main():
-    strategy = load_parameters()["strategy"]
-    classifier_name = load_parameters()["classifier"]
+    params = load_parameters()
+    strategy = params["strategy"]
+    classifier_name = params["classifier"]
+    file_params = str(params["feats_window_size"]) + "." + params["feats"] + "."
+
+    classifier_file = file_params + classifier_name + ".pkl"
+    train_feats_file = file_params + train_feats_filename
+    train_labels_file = str(params["feats_window_size"]) + "." + train_labels_filename
 
     remove_pickle(classifier_file)
 

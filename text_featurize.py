@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 from utils import load_pickle
 from utils import save_pickle
+from utils import load_parameters
 from utils import remove_pickle
 
 from sklearn import model_selection, preprocessing, linear_model, naive_bayes, metrics, svm
@@ -21,14 +22,17 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 nssi_corpus_path: str = "data/nssicorpus.txt"
 train_x_filename = "train.x.pkl"
 test_x_filename = "test.x.pkl"
-train_df_feats_filename = "train.df.feats.pkl"
-test_df_feats_filename = "test.df.feats.pkl"
-train_feats_filename = "train.feats.pkl"
-test_feats_filename = "test.feats.pkl"
+train_feats_filename = "text.train.pkl"
+test_feats_filename = "text.test.pkl"
 normalize_param = True
 
 
 def main():
+
+    params = load_parameters()
+    window_size = params["feats_window_size"]
+    train_df_feats_filename = str(window_size) + "." + train_feats_filename
+    test_df_feats_filename = str(window_size) + "." + test_feats_filename
 
     remove_pickle(train_df_feats_filename)
     remove_pickle(test_df_feats_filename)

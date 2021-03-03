@@ -14,32 +14,33 @@ from classify import main as classify
 from evaluate import main as evaluate
 from evaluate_erisk import main as eval_erisk
 from utils import update_parameters
+from utils import check_pickle
 
 last_experiment = {}
 
 def test(params, last_params):
 
-    if last_params["feats_window_size"] != params["feats_window_size"]:
-        experiment = ["windowfy", "featurize", "select_feats", "train",
-                      "classify", "evaluate", "eval_erisk"]
-    elif last_params["feats"] != params["feats"]:
-        experiment = ["select_feats", "train",
-                      "classify", "evaluate", "eval_erisk"]
-    elif last_params["classifier"] != params["classifier"]:
-        experiment = ["train",
-                      "classify", "evaluate", "eval_erisk"]
-    elif last_params["eval_window_size"] != params["eval_window_size"]:
-        experiment = ["eval_erisk"]
-    else:
-        experiment = None
-
-    if experiment is None:
-        experiment = ["windowfy", "featurize", "select_feats", "train",
-                      "classify", "evaluate", "eval_erisk"]
+    # if last_params["feats_window_size"] != params["feats_window_size"]:
+    #     experiment = ["windowfy", "featurize", "select_feats", "train",
+    #                   "classify", "evaluate", "eval_erisk"]
+    # elif last_params["feats"] != params["feats"]:
+    #     experiment = ["select_feats", "train",
+    #                   "classify", "evaluate", "eval_erisk"]
+    # elif last_params["classifier"] != params["classifier"]:
+    #     experiment = ["train",
+    #                   "classify", "evaluate", "eval_erisk"]
+    # elif last_params["eval_window_size"] != params["eval_window_size"]:
+    #     experiment = ["eval_erisk"]
+    # else:
+    #     experiment = None
+    #
+    # if experiment is None:
+    #     experiment = ["windowfy", "featurize", "select_feats", "train",
+    #                   "classify", "evaluate", "eval_erisk"]
 
     last_params = params.copy()
 
-    print("Starting experiment {}, params {}".format(experiment, params))
+    print("Starting experiment params {}".format(params))
     #experiment = ["windowfy", "text_featurize", "tfidf_featurize", "combine_features", "select_feats", "train", "classify", "evaluate", "eval_erisk"]
 
 
@@ -65,32 +66,59 @@ def test(params, last_params):
     # if "prepare" in experiment:
     #     print("Preparing data")
     #     prepare()
-    if "windowfy" in experiment:
+
+    window_file = str(params["feats_window_size"]) + ".text.train.pkl"
+    if not check_pickle(window_file):
         print("Windowfying data")
         windowfy()
-    if "featurize" in experiment:
         print("Creating text features")
         text_featurize()
         print("Creating tfidf features")
         tfidf_featurize()
         print("Combining features")
         combine_features()
-    if "select_feats" in experiment:
-        print("Selecting features")
-        select_feats()
-    if "train" in experiment:
+
+    classifier_file = str(params["feats_window_size"]) + "." + params["classifier"] + ".pkl"
+    if not check_pickle(classifier_file):
         print("Training")
         train()
-    if "classify" in experiment:
+
+    resuls_file = str(params["feats_window_size"]) + "." + params["classifier"] + ".test.resul.pkl"
+    if not check_pickle(resuls_file):
         print("Classifying")
         classify()
-    if "evaluate" in experiment:
-        print("Evaluating")
-        evaluate()
-    if "eval_erisk" in experiment:
-        print("Evaluating erisk")
-        eval_erisk()
-    print("Fin experiment {}".format(experiment))
+
+    print("Evaluating")
+    evaluate()
+    print("Evaluating erisk")
+    eval_erisk()
+
+    # if "windowfy" in experiment:
+    #     print("Windowfying data")
+    #     windowfy()
+    # if "featurize" in experiment:
+    #     print("Creating text features")
+    #     text_featurize()
+    #     print("Creating tfidf features")
+    #     tfidf_featurize()
+    #     print("Combining features")
+    #     combine_features()
+    # if "select_feats" in experiment:
+    #     print("Selecting features")
+    #     select_feats()
+    # if "train" in experiment:
+    #     print("Training")
+    #     train()
+    # if "classify" in experiment:
+    #     print("Classifying")
+    #     classify()
+    # if "evaluate" in experiment:
+    #     print("Evaluating")
+    #     evaluate()
+    # if "eval_erisk" in experiment:
+    #     print("Evaluating erisk")
+    #     eval_erisk()
+    print("Fin experiment {}".format(params))
     return last_params
 
 params_history = []
@@ -99,11 +127,11 @@ def experiments():
 
     params = load_parameters()
 
-    feats_window_sizes = [1, 10, 20, 50, 100]
-    eval_window_sizes = [1, 3, 5, 10, 20]
+    feats_window_sizes = [1, 10, 20]
+    eval_window_sizes = [1, 3, 5, 10]
     #max_features = [1000, 2000, 5000]
     feats = ["text", "tfidf", "combined"]
-    classifiers = ["svm", "linear_svm", "forest", "xgboost", "bayes"]
+    classifiers = ["svm", "linear_svm", "forest", "xgboost"]
 
 
     last_params = params.copy()

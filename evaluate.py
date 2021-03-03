@@ -6,12 +6,16 @@ from sklearn.metrics import precision_recall_curve
 import sklearn.metrics as metrics
 from utils import load_pickle
 from utils import save_pickle
+from utils import load_parameters
 import numpy
 
-test_y_file = "test.y.pkl"
+test_y_filename = "test.y.pkl"
 resul_file = "test.resul.pkl"
 
 def main():
+
+    params = load_parameters()
+    test_y_file = str(params["feats_window_size"]) + "." + test_y_filename
 
     labels = load_pickle(test_y_file)
     predictions = load_pickle(resul_file)

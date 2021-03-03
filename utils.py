@@ -26,6 +26,10 @@ def remove_pickle(filename):
     if os.path.exists(file):
         os.remove(file)
 
+def check_pickle(filename):
+    file = os.path.join(pickles_path, filename)
+    return os.path.isfile(file)
+
 ######## parameters
 
 

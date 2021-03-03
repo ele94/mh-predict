@@ -34,8 +34,8 @@ def main():
 
     print(train_users[list(train_users.keys())[0]])
 
-    save_pickle("clean.train.users.pkl", train_users)
-    save_pickle("clean.test.users.pkl", test_users)
+    save_pickle("clean.train.data.pkl", train_users)
+    save_pickle("clean.test.data.pkl", test_users)
 
 
 

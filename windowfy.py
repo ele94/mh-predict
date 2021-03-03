@@ -17,15 +17,20 @@ from utils import save_pickle
 from utils import remove_pickle
 from utils import load_parameters
 
-train_filename = "clean.train.users.pkl"
-test_filename = "clean.test.users.pkl"
+train_filename = "clean.train.data.pkl"
+test_filename = "clean.test.data.pkl"
 train_x_filename = "train.x.pkl"
 test_x_filename = "test.x.pkl"
-train_y_filename = "train.y.pkl"
-test_y_filename = "test.y.pkl"
+train_y_file = "train.y.pkl"
+test_y_file = "test.y.pkl"
 
 
 def main():
+
+    params = load_parameters()
+
+    train_y_filename = str(params["feats_window_size"]) + "." + train_y_file
+    test_y_filename = str(params["feats_window_size"]) + "." + test_y_file
 
     remove_pickle(train_x_filename)
     remove_pickle(test_x_filename)
@@ -36,10 +41,11 @@ def main():
     test_users = load_pickle(test_filename)
 
     window_type = "count"  # (count, size or time)
-    window_size = load_parameters()["feats_window_size"]
+    window_size = params["feats_window_size"]
+    range_max = params["range_max"]
 
-    train_window = windowfy_sliding(train_users, window_size)
-    test_window = windowfy_sliding(test_users, window_size)
+    train_window = windowfy_sliding(train_users, window_size, range_max)
+    test_window = windowfy_sliding(test_users, window_size, range_max)
 
     train_window_frame = pd.DataFrame(train_window)
     test_window_frame = pd.DataFrame(test_window)
@@ -124,10 +130,11 @@ def main():
 
 
 # todo check
-def windowfy_sliding(users, window_size):
+def windowfy_sliding(users, window_size, range_max=None):
     users_windows = []
     for user, writings in users.items():
-        range_max = len(writings)  # TODO parametrizar esto con la opcion de poner un maximo distinto
+        if range_max is None or range_max > len(writings):
+            range_max = len(writings)  # TODO parametrizar esto con la opcion de poner un maximo distinto
         for i in range(0, range_max - 1):  # TODO parametrizar esto
             if len(writings) <= (i + window_size):
                 window = writings[i:range_max]  # TODO comprobar este range_max
