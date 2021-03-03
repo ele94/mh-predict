@@ -128,19 +128,19 @@ def experiments():
     params = load_parameters()
 
     feats_window_sizes = [1, 10, 20, 50, 100]
-    eval_window_sizes = [1, 3, 5]
+    eval_window_sizes = [1, 2, 3]
     #max_features = [1000, 2000, 5000]
     feats = ["text", "tfidf", "combined"]
     classifiers = ["svm", "linear_svm", "forest", "xgboost"]
-
-
-    last_params = params.copy()
-    last_params["feats_window_size"] = 100
-    params["feats_window_size"] = 1
-    params["eval_window_size"] = 1
-    params["feats"] = "text"
-    params["classifier"] = "svm"
-    update_parameters(params)
+    #
+    #
+    # last_params = params.copy()
+    # last_params["feats_window_size"] = 100
+    # params["feats_window_size"] = 1
+    # params["eval_window_size"] = 1
+    # params["feats"] = "text"
+    # params["classifier"] = "svm"
+    # update_parameters(params)
 
     experiments = []
 
