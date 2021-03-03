@@ -43,7 +43,6 @@ def main():
 
     train_window_frame = pd.DataFrame(train_window)
     test_window_frame = pd.DataFrame(test_window)
-    print(train_window_frame)
 
     train_x, train_y = train_window_frame[
                            ["user", "date", "text", "title", "g_truth", "clean_text", "tokens", "pos_tags"]], \

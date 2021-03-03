@@ -15,12 +15,31 @@ from evaluate import main as evaluate
 from evaluate_erisk import main as eval_erisk
 from utils import update_parameters
 
-def test(params, experiment=None):
-    # Use a breakpoint in the code line below to debug your script.
+last_experiment = {}
+
+def test(params, last_params):
+
+    if last_params["feats_window_size"] != params["feats_window_size"]:
+        experiment = ["windowfy", "featurize", "select_feats", "train",
+                      "classify", "evaluate", "eval_erisk"]
+    elif last_params["feats"] != params["feats"]:
+        experiment = ["select_feats", "train",
+                      "classify", "evaluate", "eval_erisk"]
+    elif last_params["classifier"] != params["classifier"]:
+        experiment = ["train",
+                      "classify", "evaluate", "eval_erisk"]
+    elif last_params["eval_window_size"] != params["eval_window_size"]:
+        experiment = ["eval_erisk"]
+    else:
+        experiment = None
+
     if experiment is None:
         experiment = ["windowfy", "featurize", "select_feats", "train",
                       "classify", "evaluate", "eval_erisk"]
 
+    last_params = params.copy()
+
+    print("Starting experiment {}, params {}".format(experiment, params))
     #experiment = ["windowfy", "text_featurize", "tfidf_featurize", "combine_features", "select_feats", "train", "classify", "evaluate", "eval_erisk"]
 
 
@@ -50,19 +69,12 @@ def test(params, experiment=None):
         print("Windowfying data")
         windowfy()
     if "featurize" in experiment:
-        if "text" in params["feats"]:
-            print("Creating text features")
-            text_featurize()
-        elif "tfidf" in params["feats"]:
-            print("Creating tfidf features")
-            tfidf_featurize()
-        elif "combined" in params["feats"]:
-            print("Creating text features")
-            text_featurize()
-            print("Creating tfidf features")
-            tfidf_featurize()
-            print("Combining features")
-            combine_features()
+        print("Creating text features")
+        text_featurize()
+        print("Creating tfidf features")
+        tfidf_featurize()
+        print("Combining features")
+        combine_features()
     if "select_feats" in experiment:
         print("Selecting features")
         select_feats()
@@ -78,74 +90,58 @@ def test(params, experiment=None):
     if "eval_erisk" in experiment:
         print("Evaluating erisk")
         eval_erisk()
-    print("Fin experiment")
+    print("Fin experiment {}".format(experiment))
+    return last_params
 
-
+params_history = []
 
 def experiments():
 
     params = load_parameters()
 
-    feats_window_sizes = [1, 10, 20, 50, 100, 1000]
-    eval_window_sizes = [1, 3, 5, 10, 100]
-    max_features = [1000, 2000, 5000]
+    feats_window_sizes = [1, 10, 20, 50, 100]
+    eval_window_sizes = [1, 3, 5, 10, 20]
+    #max_features = [1000, 2000, 5000]
     feats = ["text", "tfidf", "combined"]
     classifiers = ["svm", "linear_svm", "forest", "xgboost", "bayes"]
 
-    params_history = []
-    params_history.append({'classifier': 'svm', 'eval_window_size': 100, 'feats': 'text', 'feats_window_size': 1, 'max_features': 1000, 'strategy': 'balanced'}
-)
-    params_history.append({'classifier': 'svm', 'eval_window_size': 10, 'feats': 'text', 'feats_window_size': 1, 'max_features': 1000, 'strategy': 'balanced'}
-)
 
-    params_history.append({'classifier': 'svm', 'eval_window_size': 5, 'feats': 'text', 'feats_window_size': 1, 'max_features': 1000, 'strategy': 'balanced'}
-)
-
-    params_history.append({'classifier': 'svm', 'eval_window_size': 3, 'feats': 'text', 'feats_window_size': 1, 'max_features': 1000, 'strategy': 'balanced'}
-)
-
-    params_history.append({'classifier': 'svm', 'eval_window_size': 1, 'feats': 'text', 'feats_window_size': 1, 'max_features': 1000, 'strategy': 'balanced'}
-)
-
-
-    def do_experiment(local_experiment):
-        if params not in params_history:
-            params_history.append(params)
-            update_parameters(params)
-            print("Experiment {}, params:{}".format(local_experiment, params))
-            try:
-                test(params, local_experiment)
-            except:
-                print("failed experiment {}, params:{}".format(local_experiment, params))
-        else:
-            print("Skipping duplicated experiment {}, params {}".format(local_experiment, params))
+    last_params = params.copy()
+    last_params["feats_window_size"] = 100
+    params["feats_window_size"] = 1
+    params["eval_window_size"] = 1
+    params["feats"] = "text"
+    params["classifier"] = "svm"
+    update_parameters(params)
 
     for feats_window_size in feats_window_sizes:
         for feat in feats:
             for classifier in classifiers:
                 for eval_window_size in eval_window_sizes:
-                    experiment = ["eval_erisk"]
                     params["eval_window_size"] = eval_window_size
-                    do_experiment(experiment)
-                experiment = ["train", "classify", "evaluate", "eval_erisk"]
+                    last_params = do_experiment(params, last_params)
                 params["classifier"] = classifier
-                do_experiment(experiment)
-            if not feat == "text":
-                for max_feature in max_features:
-                    experiment = ["featurize", "select_feats", "train", "classify", "evaluate", "eval_erisk"]
-                    params["max_features"] = max_feature
-                    do_experiment(experiment)
-            experiment = ["select_feats", "train", "classify", "evaluate", "eval_erisk"]
+                last_params = do_experiment(params, last_params)
             params["feats"] = feat
-            do_experiment(experiment)
-        experiment = None
+            last_params = do_experiment(params, last_params)
         params["feats_window_size"] = feats_window_size
-        do_experiment(experiment)
+        last_params = do_experiment(params, last_params)
 
     print("ENDED EXPERIMENTS")
     # want to test all combinations
 
-
+def do_experiment(params, last_params):
+    if params not in params_history:
+        params_history.append(params.copy())
+        update_parameters(params)
+        try:
+            last_params = test(params, last_params)
+        except Exception as e:
+            print("failed params:{}".format(params))
+            print("Exception: {}".format(e))
+    else:
+        print("Skipping duplicated params {}".format(params))
+    return last_params.copy()
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':

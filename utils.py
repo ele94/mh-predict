@@ -34,9 +34,11 @@ def load_parameters():
         params = yaml.load(f, Loader=yaml.FullLoader)
     return params
 
+
 def update_parameters(params):
     with open(params_file, 'w') as f:
         yaml.safe_dump(params, f, default_flow_style=False)
+    return params
 
 
 

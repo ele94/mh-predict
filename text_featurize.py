@@ -36,9 +36,7 @@ def main():
     train_x = load_pickle(train_x_filename)
     test_x = load_pickle(test_x_filename)
 
-    print(train_x.isnull().values.any())
     train_feats = create_features(train_x, normalize_param)
-    print(train_feats.isnull().values.any())
 
     test_feats = create_features(test_x, normalize_param)
 
@@ -62,7 +60,6 @@ def create_features(users_df, normalize=True):
     new_feats = pd.DataFrame()
 
     text_length = users_df['clean_text'].map(len)
-    print(text_length)
 
     new_feats['char_count'] = users_df['clean_text'].map(len)
     new_feats['word_count'] = users_df['clean_text'].map(lambda x: len(x.split()))
@@ -82,13 +79,10 @@ def create_features(users_df, normalize=True):
 
     reg = r'\bI\b|\bme\b|\bmine\b|\bmy\b|\bmyself\b'
     new_feats['first_prons'] = users_df['clean_text'].map(lambda x: len(re.findall(reg, x)))
-    print(new_feats.isnull().values.any())
 
     sid = SentimentIntensityAnalyzer()
     new_feats['sentiment'] = users_df['clean_text'].map(lambda x: round(sid.polarity_scores(x)['compound'], 2))
-    print(new_feats.isnull().values.any())
     new_feats['nssi_words'] = users_df['tokens'].map(lambda x: sum((' '.join(x)).count(word) for word in nssi_corpus))
-    print(new_feats.isnull().values.any())
     pos_family = {
         'noun': ['NN', 'NNS', 'NNP', 'NNPS'],
         'pron': ['PRP', 'PRP$', 'WP', 'WP$'],
@@ -109,7 +103,6 @@ def create_features(users_df, normalize=True):
     new_feats['verb_count'] = users_df['pos_tags'].map(lambda x: check_pos_tag(x, 'verb'))
     new_feats['adj_count'] = users_df['pos_tags'].map(lambda x: check_pos_tag(x, 'adj'))
     new_feats['adv_count'] = users_df['pos_tags'].map(lambda x: check_pos_tag(x, 'adv'))
-    print(new_feats.isnull().values.any())
 
     #normalize features by text length:
     #newFeats['word_count'] = newFeats['word_count'] / text_length
@@ -117,13 +110,10 @@ def create_features(users_df, normalize=True):
     # def normalize_feature(feature, normalizer):
     #     return feature / normalizer
 
-    print("Before normalizing", new_feats.isnull().values.any())
     if normalize:
         for feature in new_feats.columns:
             if feature not in normalize_exceptions:
                 new_feats[feature] = new_feats[feature] / text_length
-
-    print("After normalizing", new_feats.isnull().values.any())
 
     for feat in exclude_features:
         new_feats.drop(feat, inplace=True, axis=1)
