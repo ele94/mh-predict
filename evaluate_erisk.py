@@ -28,7 +28,8 @@ def main():
     resul_file = str(params["feats_window_size"]) + "." + params["feats"] + "." + params["classifier"] + "." + resul_filename
     score_file = str(params["feats_window_size"]) + "." + params["feats"] + "." + params["classifier"] + "." + score_filename
 
-    window_size = load_parameters()["eval_window_size"]
+    feats_window_size = params["feats_window_size"]
+    window_size = params["eval_window_size"]
 
     g_truth = load_golden_truth(test_data_path, g_truth_filename)
     test_resuls = load_pickle(resul_file)
@@ -38,7 +39,7 @@ def main():
     user_resul = prepare_data(test_x, test_resuls)
     user_scores = prepare_data(test_x, test_scores)
 
-    test_resul_proc = process_decisions(user_resul, user_scores, window_size)
+    test_resul_proc = process_decisions(user_resul, user_scores, feats_window_size, max_strategy=window_size)
     eval_resuls = eval_performance(test_resul_proc, g_truth)
 
     write_csv(eval_resuls)
@@ -99,7 +100,7 @@ def array_to_dict(l):
      else d.update({t[0]: [t[1]]}) for t in l]
     return d
 
-def process_decisions(user_decisions, user_scores, max_strategy=5):
+def process_decisions(user_decisions, user_scores, feat_window_size, max_strategy=5):
     decision_list = []
     new_user_decisions = {}
     new_user_sequence = {}
@@ -117,11 +118,11 @@ def process_decisions(user_decisions, user_scores, max_strategy=5):
             if decisions[i] == 0 and count < max:
                 count = 0
                 new_user_decisions[user].append(0)
-                new_user_sequence[user].append(i)
+                new_user_sequence[user].append(i+feat_window_size)
             elif decisions[i] == 1 and count < max:
                 count = count +1
                 new_user_decisions[user].append(0)
-                new_user_sequence[user].append(i)
+                new_user_sequence[user].append(i+feat_window_size)
             elif count >= max:
                 new_user_decisions[user].append(1)
                 new_user_sequence[user].append(new_user_sequence[user][i-1])

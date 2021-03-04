@@ -127,9 +127,8 @@ def experiments():
 
     params = load_parameters()
 
-    feats_window_sizes = [1, 10, 20, 50, 100]
-    eval_window_sizes = [1, 2, 3]
-    #max_features = [1000, 2000, 5000]
+    feats_window_sizes = [1, 3, 5, 10, 20, 50, 100]
+    eval_window_sizes = [1, 3, 5, 10]
     feats = ["text", "tfidf", "combined"]
     classifiers = ["svm", "linear_svm", "forest", "xgboost"]
     #
@@ -145,17 +144,14 @@ def experiments():
     experiments = []
 
     for feats_window_size in feats_window_sizes:
-        params["feats_window_size"] = feats_window_size
         for feat in feats:
-            params["feats"] = feat
             for classifier in classifiers:
-                params["classifier"] = classifier
                 for eval_window_size in eval_window_sizes:
+                    params["feats_window_size"] = feats_window_size
+                    params["feats"] = feat
+                    params["classifier"] = classifier
                     params["eval_window_size"] = eval_window_size
                     experiments.append(params.copy())
-                experiments.append(params.copy())
-            experiments.append(params.copy())
-        experiments.append(params.copy())
 
     for experiment in experiments:
         do_experiment(experiment.copy())
