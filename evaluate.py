@@ -8,19 +8,17 @@ from utils import load_pickle
 from utils import save_pickle
 from utils import load_parameters
 import numpy
-
-test_y_filename = "test.y.pkl"
-resul_filename = "test.resul.pkl"
+import filenames as fp
 
 def main():
 
     params = load_parameters()
-    test_y_file = str(params["feats_window_size"]) + "." + test_y_filename
-    resul_file = str(params["feats_window_size"]) + "." + params["feats"] + "." + params[
-        "classifier"] + "." + resul_filename
 
-    labels = load_pickle(test_y_file)
-    predictions = load_pickle(resul_file)
+    resuls_path = fp.get_resuls_path()
+    window_path = fp.get_window_path()
+
+    labels = load_pickle(window_path, fp.test_y_filename)
+    predictions = load_pickle(resuls_path, fp.resul_file)
 
     classification_report = metrics.classification_report(labels, predictions)
     confusion_matrix = metrics.confusion_matrix(labels, predictions)

@@ -17,6 +17,7 @@ import pandas as pd
 from sklearn import model_selection, preprocessing
 from utils import load_pickle
 from utils import save_pickle
+import filenames as fp
 
 train_data_path = "/home/elena/Documentos/UNED/erisk/2021/data/erisk2021_training_data"
 test_data_path = "/home/elena/Documentos/UNED/erisk/2021/data/erisk2021_test_data"
@@ -34,8 +35,8 @@ def main():
 
     print(train_users[list(train_users.keys())[0]])
 
-    save_pickle("clean.train.data.pkl", train_users)
-    save_pickle("clean.test.data.pkl", test_users)
+    save_pickle(fp.pickles_path, fp.train_filename, train_users)
+    save_pickle(fp.pickles_path, fp.test_filename, test_users)
 
 
 

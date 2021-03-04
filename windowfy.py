@@ -16,29 +16,25 @@ from utils import load_pickle
 from utils import save_pickle
 from utils import remove_pickle
 from utils import load_parameters
+import utils
+import os
+import filenames as fp
 
-train_filename = "clean.train.data.pkl"
-test_filename = "clean.test.data.pkl"
-train_x_filename = "train.x.pkl"
-test_x_filename = "test.x.pkl"
-train_y_file = "train.y.pkl"
-test_y_file = "test.y.pkl"
 
 
 def main():
 
     params = load_parameters()
 
-    train_y_filename = str(params["feats_window_size"]) + "." + train_y_file
-    test_y_filename = str(params["feats_window_size"]) + "." + test_y_file
+    window_path = fp.get_window_path()
 
-    remove_pickle(train_x_filename)
-    remove_pickle(test_x_filename)
-    remove_pickle(train_y_filename)
-    remove_pickle(test_y_filename)
+    remove_pickle(fp.pickles_path, fp.train_x_filename)
+    remove_pickle(fp.pickles_path, fp.test_x_filename)
+    remove_pickle(fp.pickles_path, fp.train_y_filename)
+    remove_pickle(fp.pickles_path, fp.test_y_filename)
 
-    train_users = load_pickle(train_filename)
-    test_users = load_pickle(test_filename)
+    train_users = load_pickle(fp.pickles_path, fp.train_filename)
+    test_users = load_pickle(fp.pickles_path, fp.test_filename)
 
     window_type = "count"  # (count, size or time)
     window_size = params["feats_window_size"]
@@ -61,10 +57,10 @@ def main():
     train_y = encoder.fit_transform(train_y)
     test_y = encoder.fit_transform(test_y)
 
-    save_pickle(train_x_filename, train_x)
-    save_pickle(test_x_filename, test_x)
-    save_pickle(train_y_filename, train_y)
-    save_pickle(test_y_filename, test_y)
+    save_pickle(window_path, fp.train_x_filename, train_x)
+    save_pickle(window_path, fp.test_x_filename, test_x)
+    save_pickle(window_path, fp.train_y_filename, train_y)
+    save_pickle(window_path, fp.test_y_filename, test_y)
 
 
 # def windowfy(data_users, window_size):
@@ -130,11 +126,12 @@ def main():
 
 
 # todo check
-def windowfy_sliding(users, window_size, range_max=None):
+def windowfy_sliding(users, window_size, param_range_max=-1):
     users_windows = []
     for user, writings in users.items():
-        if range_max is None or range_max > len(writings):
-            range_max = len(writings)  # TODO parametrizar esto con la opcion de poner un maximo distinto
+        if param_range_max < 0 or param_range_max > len(writings):
+            range_max = len(writings)
+        else: range_max = param_range_max
         for i in range(0, range_max - 1):  # TODO parametrizar esto
             if len(writings) <= (i + window_size):
                 window = writings[i:range_max]  # TODO comprobar este range_max

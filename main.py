@@ -15,6 +15,7 @@ from evaluate import main as evaluate
 from evaluate_erisk import main as eval_erisk
 from utils import update_parameters
 from utils import check_pickle
+import filenames as fp
 
 last_experiment = {}
 
@@ -67,8 +68,7 @@ def test(params):
     #     print("Preparing data")
     #     prepare()
 
-    window_file = str(params["feats_window_size"]) + ".text.train.pkl"
-    if not check_pickle(window_file):
+    if not check_pickle(fp.get_feats_path(), fp.train_df_feats_filename):
         print("Windowfying data")
         windowfy()
         print("Creating text features")
@@ -78,13 +78,12 @@ def test(params):
         print("Combining features")
         combine_features()
 
-    classifier_file = str(params["feats_window_size"]) + "." + params["feats"] + "." + params["classifier"] + ".pkl"
-    if not check_pickle(classifier_file):
-        print("Training")
+    classifier_file = params["classifier"] + ".pkl"
+    if not check_pickle(fp.get_classifier_path(), classifier_file):
+        print("Training {}".format(params["classifier"]))
         train()
 
-    resuls_file = str(params["feats_window_size"]) + "." + params["feats"] + "." + params["classifier"] + ".test.resul.pkl"
-    if not check_pickle(resuls_file):
+    if not check_pickle(fp.get_resuls_path(), fp.resul_file):
         print("Classifying")
         classify()
 
@@ -127,10 +126,10 @@ def experiments():
 
     params = load_parameters()
 
-    feats_window_sizes = [1, 3, 5, 10, 20, 50, 100]
-    eval_window_sizes = [1, 3, 5, 10]
+    feats_window_sizes = [1, 5, 10, 20]
+    eval_window_sizes = [1, 2, 3]
     feats = ["text", "tfidf", "combined"]
-    classifiers = ["svm", "linear_svm", "forest", "xgboost"]
+    classifiers = ["svm", "linear_svm", "xgboost"]
     #
     #
     # last_params = params.copy()

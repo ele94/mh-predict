@@ -10,6 +10,7 @@ from utils import load_pickle
 from utils import save_pickle
 from utils import load_parameters
 from utils import remove_pickle
+import filenames as fp
 
 from sklearn import model_selection, preprocessing, linear_model, naive_bayes, metrics, svm
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
@@ -19,11 +20,7 @@ import pandas, xgboost, numpy, textblob, string, re
 from sklearn.model_selection import train_test_split
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
-nssi_corpus_path: str = "data/nssicorpus.txt"
-train_x_filename = "train.x.pkl"
-test_x_filename = "test.x.pkl"
-train_feats_filename = "text.train.pkl"
-test_feats_filename = "text.test.pkl"
+
 normalize_param = True
 
 
@@ -31,21 +28,21 @@ def main():
 
     params = load_parameters()
     window_size = params["feats_window_size"]
-    train_df_feats_filename = str(window_size) + "." + train_feats_filename
-    test_df_feats_filename = str(window_size) + "." + test_feats_filename
+    feats_path = fp.get_feats_path()
+    window_path = fp.get_window_path()
 
-    remove_pickle(train_df_feats_filename)
-    remove_pickle(test_df_feats_filename)
+    remove_pickle(feats_path, fp.train_df_feats_filename)
+    remove_pickle(feats_path, fp.test_df_feats_filename)
 
-    train_x = load_pickle(train_x_filename)
-    test_x = load_pickle(test_x_filename)
+    train_x = load_pickle(window_path, fp.train_x_filename)
+    test_x = load_pickle(window_path, fp.test_x_filename)
 
     train_feats = create_features(train_x, normalize_param)
 
     test_feats = create_features(test_x, normalize_param)
 
-    save_pickle(train_df_feats_filename, train_feats)
-    save_pickle(test_df_feats_filename, test_feats)
+    save_pickle(feats_path, fp.train_df_feats_filename, train_feats)
+    save_pickle(feats_path, fp.test_df_feats_filename, test_feats)
 
     #train_feats.to_csv(r'train_feats.csv')
     #test_feats.to_csv(r'test_feats.csv')
@@ -56,7 +53,7 @@ def create_features(users_df, normalize=True):
     normalize_exceptions = ['char_count', 'word_density']
     exclude_features = ['char_count', 'word_count']
 
-    with open(nssi_corpus_path, 'r') as file:
+    with open(fp.nssi_corpus_path, 'r') as file:
         nssi_corpus = file.read().replace('*', '')
     nssi_corpus = nssi_corpus.split('\n')
     nssi_corpus.remove('')

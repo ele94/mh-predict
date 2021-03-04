@@ -3,32 +3,40 @@ import pickle
 import yaml
 
 params_file = "params.yaml"
-pickles_path = "data/pickles"
 
 ######### pickles
 
-
-def save_pickle(filename, data):
-    file = os.path.join(pickles_path, filename)
+def save_pickle(paths, filename, data):
+    filepaths = os.path.join(paths)
+    if not os.path.exists(filepaths):
+        os.makedirs(filepaths)
+    file = os.path.join(filepaths, filename)
     with open(file, 'wb') as data_file:
         pickle.dump(data, data_file)
 
 
-def load_pickle(filename):
-    file = os.path.join(pickles_path, filename)
+def load_pickle(paths, filename):
+    filepaths = os.path.join(paths)
+    file = os.path.join(filepaths, filename)
     with open(file, 'rb') as data_file:
         data = pickle.load(data_file)
     return data
 
 
-def remove_pickle(filename):
-    file = os.path.join(pickles_path, filename)
+def remove_pickle(paths, filename):
+    filepaths = os.path.join(paths)
+    file = os.path.join(filepaths, filename)
     if os.path.exists(file):
         os.remove(file)
 
-def check_pickle(filename):
-    file = os.path.join(pickles_path, filename)
-    return os.path.isfile(file)
+def check_pickle(paths, filename):
+    filepaths = os.path.join(paths)
+    if os.path.exists(filepaths):
+        file = os.path.join(filepaths, filename)
+        return os.path.isfile(file)
+    else:
+        return False
+
 
 ######## parameters
 
@@ -43,16 +51,6 @@ def update_parameters(params):
     with open(params_file, 'w') as f:
         yaml.safe_dump(params, f, default_flow_style=False)
     return params
-
-
-
-
-
-
-
-
-
-
 
 
 

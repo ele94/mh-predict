@@ -9,28 +9,27 @@ from utils import save_pickle
 from utils import remove_pickle
 from utils import load_parameters
 import os
-
-train_x_file = "train.x.pkl"
-test_x_file = "test.x.pkl"
-train_feats_file = "tfidf.train.pkl"
-test_feats_file = "tfidf.test.pkl"
+import filenames as fp
 
 
 def main():
 
     params = load_parameters()
     window_size = params["feats_window_size"]
+    feats_path = fp.get_feats_path()
+    window_path = fp.get_window_path()
 
-    train_word_file = str(window_size) + "." + train_feats_file
-    test_word_file = str(window_size) + "." + test_feats_file
+    #
+    # train_word_file = str(window_size) + "." + train_feats_file
+    # test_word_file = str(window_size) + "." + test_feats_file
 
-    remove_pickle(train_word_file)
-    remove_pickle(test_word_file)
+    remove_pickle(feats_path, fp.train_word_file)
+    remove_pickle(feats_path, fp.test_word_file)
 
-    train_x = load_pickle(train_x_file)
-    test_x = load_pickle(test_x_file)
+    train_x = load_pickle(window_path, fp.train_x_filename)
+    test_x = load_pickle(window_path, fp.test_x_filename)
 
-    max_features = load_parameters()["max_features"]
+    max_features = params["max_features"]
 
     print("Word-level tf-idf")
     # word level tf-idf
@@ -40,8 +39,8 @@ def main():
     xtest_tfidf = tfidf_vect.transform(test_x["clean_text"])
     tfidf_vect = None
 
-    save_pickle(train_word_file, xtrain_tfidf)
-    save_pickle(test_word_file, xtest_tfidf)
+    save_pickle(feats_path, fp.train_word_file, xtrain_tfidf)
+    save_pickle(feats_path, fp.test_word_file, xtest_tfidf)
 
     xtrain_tfidf = None
     xtest_tfidf = None

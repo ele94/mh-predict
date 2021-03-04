@@ -8,12 +8,10 @@ import pickle
 import os
 from utils import load_pickle
 from utils import save_pickle
+import filenames as fp
 
 test_data_path = "/home/elena/Documentos/UNED/erisk/2021/data/erisk2021_test_data"
 g_truth_filename = "golden_truth.txt"
-resul_filename = "test.resul.pkl"
-score_filename = "test.scores.pkl"
-test_x_file = "test.x.pkl"
 erisk_eval_file = "erisk.eval.resuls.csv"
 from pprint import pprint
 import numpy as np
@@ -25,16 +23,16 @@ def main():
 
     params = load_parameters()
 
-    resul_file = str(params["feats_window_size"]) + "." + params["feats"] + "." + params["classifier"] + "." + resul_filename
-    score_file = str(params["feats_window_size"]) + "." + params["feats"] + "." + params["classifier"] + "." + score_filename
-
     feats_window_size = params["feats_window_size"]
     window_size = params["eval_window_size"]
 
+    resuls_path = fp.get_resuls_path()
+    window_path = fp.get_window_path()
+
     g_truth = load_golden_truth(test_data_path, g_truth_filename)
-    test_resuls = load_pickle(resul_file)
-    test_scores = load_pickle(score_file)
-    test_x = load_pickle(test_x_file)
+    test_resuls = load_pickle(resuls_path, fp.resul_file)
+    test_scores = load_pickle(resuls_path, fp.score_file)
+    test_x = load_pickle(window_path, fp.test_x_filename)
 
     user_resul = prepare_data(test_x, test_resuls)
     user_scores = prepare_data(test_x, test_scores)
