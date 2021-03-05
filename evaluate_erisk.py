@@ -37,7 +37,7 @@ def main():
     user_resul = prepare_data(test_x, test_resuls)
     user_scores = prepare_data(test_x, test_scores)
 
-    test_resul_proc = process_decisions(user_resul, user_scores, feats_window_size, max_strategy=window_size)
+    test_resul_proc = process_decisions_w2(user_resul, user_scores, feats_window_size, max_strategy=window_size)
     eval_resuls = eval_performance(test_resul_proc, g_truth)
 
     write_csv(eval_resuls)
@@ -98,7 +98,43 @@ def array_to_dict(l):
      else d.update({t[0]: [t[1]]}) for t in l]
     return d
 
-def process_decisions(user_decisions, user_scores, feat_window_size, max_strategy=5):
+def process_decisions_w2(user_decisions, user_scores, feats_window_size, max_strategy=5):
+    decision_list = []
+    new_user_decisions = {}
+    new_user_sequence = {}
+    max = max_strategy
+
+    for user, decisions in user_decisions.items():
+        new_user_decisions[user] = []
+        new_user_sequence[user] = []
+
+    # politica de decisiones: decidimos que un usuario es positivo a partir del 5 mensaje positivo consecutivo
+    # a partir de ahi, todas las decisiones deben ser positivas, y la secuencia mantenerse estable
+    for user, decisions in user_decisions.items():
+        count = 0
+        for i in range(0, len(decisions)):
+            if decisions[i] == 0 and count < max:
+                count = 0
+                new_user_decisions[user].append(0)
+                new_user_sequence[user].append(i)
+            elif decisions[i] == 1 and count < max:
+                count = count + 1
+                new_user_decisions[user].append(0)
+                new_user_sequence[user].append(i)
+            elif count >= max:
+                new_user_decisions[user].append(1)
+                new_user_sequence[user].append(new_user_sequence[user][i - 1])
+
+    # lo montamos en el formato que acepta el evaluador
+    for user, decisions in new_user_decisions.items():
+        decision_list.append(
+            {"nick": user, "decision": new_user_decisions[user][-1], "sequence": new_user_sequence[user][-1], "score":
+                user_scores[user][-1]})
+
+    return decision_list
+
+
+def process_decisions_w1(user_decisions, user_scores, feat_window_size, max_strategy=5):
     decision_list = []
     new_user_decisions = {}
     new_user_sequence = {}

@@ -19,6 +19,7 @@ from utils import load_parameters
 import utils
 import os
 import filenames as fp
+import numpy as np
 
 
 
@@ -36,12 +37,14 @@ def main():
     train_users = load_pickle(fp.pickles_path, fp.train_filename)
     test_users = load_pickle(fp.pickles_path, fp.test_filename)
 
+
     window_type = "count"  # (count, size or time)
     window_size = params["feats_window_size"]
+    weights_window_size = params["weights_window_size"]
     range_max = params["range_max"]
 
-    train_window = windowfy_sliding(train_users, window_size, range_max)
-    test_window = windowfy_sliding(test_users, window_size, range_max)
+    train_window = windowfy_sliding_training(train_users, window_size, range_max)
+    test_window = windowfy_sliding_testing(test_users, window_size, range_max)
 
     train_window_frame = pd.DataFrame(train_window)
     test_window_frame = pd.DataFrame(test_window)
@@ -57,6 +60,9 @@ def main():
     train_y = encoder.fit_transform(train_y)
     test_y = encoder.fit_transform(test_y)
 
+    window_sample_weights = get_window_sample_weights(train_users, weights_window_size, window_size, range_max)
+
+    save_pickle(window_path, fp.train_weights_file, window_sample_weights)
     save_pickle(window_path, fp.train_x_filename, train_x)
     save_pickle(window_path, fp.test_x_filename, test_x)
     save_pickle(window_path, fp.train_y_filename, train_y)
@@ -126,22 +132,60 @@ def main():
 
 
 # todo check
-def windowfy_sliding(users, window_size, param_range_max=-1):
+
+def windowfy_sliding_training(users, window_size, param_range_max=-1):
     users_windows = []
-    for user, writings in users.items():
-        if param_range_max < 0 or param_range_max > len(writings):
-            range_max = len(writings)
-        else: range_max = param_range_max
-        for i in range(0, range_max - 1):  # TODO parametrizar esto
-            if len(writings) <= (i + window_size):
+    for user, user_writings in users.items():
+        count = 0
+        if param_range_max < 0 or param_range_max > len(user_writings):
+            range_max = len(user_writings)
+            writings = user_writings.copy()
+        else:
+            range_max = param_range_max
+            writings = user_writings.copy()[:range_max]
+        for i in range(0, range_max):  # TODO parametrizar esto
+            #if i < window_size and len(writings) > (i + 1):
+            #    window = writings[:i + 1]  # rellenamos mientras "no nos llegan los demas mensajes"
+            if len(writings) < (i + window_size):
                 window = writings[i:range_max]  # TODO comprobar este range_max
+                continue
             else:
                 window = writings[i:i + window_size]
 
             if len(window) == 0:
                 print("Window: {}, i: {}, len(writings): {}".format(window, i, len(writings)))
-            window = join_window_elements(window)
-            users_windows.append(window)
+
+            joined_window = join_window_elements(window)
+            users_windows.append(joined_window)
+            count += 1
+
+    print("Length of train data after windowfying: {}".format(len(users_windows)))
+    return users_windows
+
+
+def windowfy_sliding_testing(users, window_size, param_range_max=-1):
+    users_windows = []
+    for user, writings in users.items():
+        count = 0
+        if param_range_max < 0 or param_range_max > len(writings):
+            range_max = len(writings)
+        else:
+            range_max = param_range_max
+        for i in range(0, range_max):  # TODO parametrizar esto
+            if i < window_size and len(writings) > (i+1):
+                window = writings[:i+1] # rellenamos mientras "no nos llegan los demas mensajes" # todo cambiar esto
+            elif len(writings) < (i + window_size):
+                #window = writings[i:range_max]  # TODO comprobar este range_max
+                window = []
+            else:
+                window = writings[i:i + window_size]
+
+            if len(window) == 0:
+                print("Window: {}, i: {}, len(writings): {}".format(window, i, len(writings)))
+            else:
+                joined_window = join_window_elements(window)
+                users_windows.append(joined_window)
+                count += 1
 
     return users_windows
 
@@ -174,6 +218,44 @@ def join_window_elements(window: list) -> dict:
     return joint_window
 
 
+def get_window_sample_weights(users, weights_window_size, feats_window_size, param_range_max=-1):
+
+    flatten = lambda t: [item for sublist in t for item in sublist]
+
+    my_range = int(weights_window_size/feats_window_size)
+    positive_samples_weights = [x / (1.0*my_range) for x in range((1*my_range), (2*my_range), 1)]
+    positive_samples_weights.sort(reverse=True)
+    negative_samples_weights = np.ones(1)
+
+    users_sample_weights = []
+
+    for user, user_writings in users.items():
+
+        if param_range_max < 0 or param_range_max > len(user_writings):
+            range_max = len(user_writings)
+        else:
+            range_max = param_range_max
+
+        if range_max < feats_window_size:
+            print("Skipped user {} because writings size {} and window size {}".format(user, len(user_writings), feats_window_size))
+            continue
+        else:
+            if user_writings[0]['g_truth'] == 1:
+                user_samples_weights = positive_samples_weights.copy()
+            else:
+                user_samples_weights = negative_samples_weights.copy()
+
+            new_max_size = (range_max - feats_window_size) +1
+            if len(user_samples_weights) < new_max_size:
+                end_size = new_max_size - len(user_samples_weights)
+                user_samples_weights = list(np.pad(user_samples_weights, (0, end_size), 'minimum'))
+            else:
+                user_samples_weights = list(np.resize(user_samples_weights, new_max_size))
+            users_sample_weights.append(list(user_samples_weights))
+
+    users_sample_weights = flatten(users_sample_weights)
+    print("Final sample weights length: {}".format(len(users_sample_weights)))
+    return users_sample_weights
 
 if __name__ == '__main__':
     main()

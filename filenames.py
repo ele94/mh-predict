@@ -19,6 +19,7 @@ train_feats_file = "train.pkl"
 test_feats_file = "test.pkl"
 resul_file = "test.resul.pkl"
 score_file = "test.scores.pkl"
+train_weights_file = "train.weights.pkl"
 
 
 nssi_corpus_path = "data/nssicorpus.txt"
@@ -33,10 +34,12 @@ def get_window_path():
     return filepath
 
 def get_feats_path():
-    return get_window_path()
+    filepath = get_window_path()
+    return filepath
 
 def get_classifier_path():
-    return os.path.join(get_window_path(), str(load_parameters()["classifier"]))
+    params = load_parameters()
+    return os.path.join(get_feats_path(), str(params["feats"]), str(params["strategy"]), str(params["classifier"]))
 
 def get_resuls_path():
     return get_classifier_path()

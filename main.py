@@ -8,6 +8,7 @@ from windowfy import main as windowfy
 from text_featurize import main as text_featurize
 from tfidf_featurize import main as tfidf_featurize
 from combine_features import main as combine_features
+from sample_weights import main as sample_weights
 from select_feats import main as select_feats
 from train import main as train
 from classify import main as classify
@@ -21,52 +22,7 @@ last_experiment = {}
 
 def test(params):
 
-    # if last_params["feats_window_size"] != params["feats_window_size"]:
-    #     experiment = ["windowfy", "featurize", "select_feats", "train",
-    #                   "classify", "evaluate", "eval_erisk"]
-    # elif last_params["feats"] != params["feats"]:
-    #     experiment = ["select_feats", "train",
-    #                   "classify", "evaluate", "eval_erisk"]
-    # elif last_params["classifier"] != params["classifier"]:
-    #     experiment = ["train",
-    #                   "classify", "evaluate", "eval_erisk"]
-    # elif last_params["eval_window_size"] != params["eval_window_size"]:
-    #     experiment = ["eval_erisk"]
-    # else:
-    #     experiment = None
-    #
-    # if experiment is None:
-    #     experiment = ["windowfy", "featurize", "select_feats", "train",
-    #                   "classify", "evaluate", "eval_erisk"]
-
-    last_params = params.copy()
-
     print("Starting experiment params {}".format(params))
-    #experiment = ["windowfy", "text_featurize", "tfidf_featurize", "combine_features", "select_feats", "train", "classify", "evaluate", "eval_erisk"]
-
-
-    # from the beginning
-    #experiment = ["prepare", "windowfy", "text_featurize", "tfidf_featurize", "combine_features", "select_feats", "train", "classify", "evaluate", "eval_erisk"]
-
-    # combining features from clean data
-    #experiment = ["windowfy", "text_featurize", "tfidf_featurize", "combine_features", "select_feats", "train", "classify", "evaluate", "eval_erisk"]
-
-    # text features from clean data
-    #experiment = ["windowfy","text_featurize","select_feats", "train", "classify", "evaluate", "eval_erisk"]
-
-    #tfidf features from clean data
-    #experiment = ["windowfy","tfidf_featurize","select_feats", "train", "classify", "evaluate", "eval_erisk"]
-
-    # select feats from window already selected
-    #experiment = ["select_feats", "train", "classify", "evaluate", "eval_erisk"]
-
-    # experiment with erisk decision params
-    #experiment = ["eval_erisk"]
-
-
-    # if "prepare" in experiment:
-    #     print("Preparing data")
-    #     prepare()
 
     if not check_pickle(fp.get_feats_path(), fp.train_df_feats_filename):
         print("Windowfying data")
@@ -92,33 +48,7 @@ def test(params):
     print("Evaluating erisk")
     eval_erisk()
 
-    # if "windowfy" in experiment:
-    #     print("Windowfying data")
-    #     windowfy()
-    # if "featurize" in experiment:
-    #     print("Creating text features")
-    #     text_featurize()
-    #     print("Creating tfidf features")
-    #     tfidf_featurize()
-    #     print("Combining features")
-    #     combine_features()
-    # if "select_feats" in experiment:
-    #     print("Selecting features")
-    #     select_feats()
-    # if "train" in experiment:
-    #     print("Training")
-    #     train()
-    # if "classify" in experiment:
-    #     print("Classifying")
-    #     classify()
-    # if "evaluate" in experiment:
-    #     print("Evaluating")
-    #     evaluate()
-    # if "eval_erisk" in experiment:
-    #     print("Evaluating erisk")
-    #     eval_erisk()
     print("Fin experiment {}".format(params))
-    return last_params
 
 params_history = []
 
@@ -127,30 +57,24 @@ def experiments():
     params = load_parameters()
 
     feats_window_sizes = [1, 5, 10, 20]
-    eval_window_sizes = [1, 2, 3]
+    eval_window_sizes = [1]
     feats = ["text", "tfidf", "combined"]
-    classifiers = ["svm", "linear_svm", "xgboost"]
-    #
-    #
-    # last_params = params.copy()
-    # last_params["feats_window_size"] = 100
-    # params["feats_window_size"] = 1
-    # params["eval_window_size"] = 1
-    # params["feats"] = "text"
-    # params["classifier"] = "svm"
-    # update_parameters(params)
+    classifiers = ["xgboost", "forest", "svm", "linear_svm"]
+    strategies = ["balanced", "weights"]
 
     experiments = []
 
     for feats_window_size in feats_window_sizes:
         for feat in feats:
             for classifier in classifiers:
-                for eval_window_size in eval_window_sizes:
-                    params["feats_window_size"] = feats_window_size
-                    params["feats"] = feat
-                    params["classifier"] = classifier
-                    params["eval_window_size"] = eval_window_size
-                    experiments.append(params.copy())
+                for strategy in strategies:
+                    for eval_window_size in eval_window_sizes:
+                        params["strategy"] = strategy
+                        params["feats_window_size"] = feats_window_size
+                        params["feats"] = feat
+                        params["classifier"] = classifier
+                        params["eval_window_size"] = eval_window_size
+                        experiments.append(params.copy())
 
     for experiment in experiments:
         do_experiment(experiment.copy())
