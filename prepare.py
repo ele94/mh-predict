@@ -33,8 +33,6 @@ def main():
     train_users = preprocess_data(train_users)
     test_users = preprocess_data(test_users)
 
-    print(train_users[list(train_users.keys())[0]])
-
     save_pickle(fp.pickles_path, fp.train_filename, train_users)
     save_pickle(fp.pickles_path, fp.test_filename, test_users)
 
@@ -53,6 +51,7 @@ def preprocess_data(users):
                 print("Text less than 0: ", writing["text"])
             writing["tokens"] = tokenize_text(writing["clean_text"])
             writing["pos_tags"] = pos_tag_text(writing["tokens"])
+            writing["stems"] = stemmize_text(writing["tokens"])
             preproc_writings.append(writing)
 
         preproc_users[user] = preproc_writings
@@ -83,7 +82,7 @@ def load_user_data(dir_path, dir_name, g_truth):
 
         user_writings = []
 
-        for writing in root.findall('WRITING'):
+        for index, writing in enumerate(root.findall('WRITING')):
             title, text, date = "", "", ""
             if writing.find('TITLE') is not None:
                 title = writing.find('TITLE').text
@@ -99,9 +98,9 @@ def load_user_data(dir_path, dir_name, g_truth):
                     date = ""
 
             if len(title) > 0:
-                user_writing = {"user": user, "g_truth": g_truth[user], "date": date, "text": title + ". " + text, "title": title}
+                user_writing = {"user": user, "g_truth": g_truth[user], "date": date, "text": title + ". " + text, "title": title, "sequence": index}
             else:
-                user_writing = {"user": user, "g_truth": g_truth[user], "date": date, "text": text, "title": title}
+                user_writing = {"user": user, "g_truth": g_truth[user], "date": date, "text": text, "title": title, "sequence": index}
             user_writings.append(user_writing)
 
         users[user] = user_writings
@@ -139,6 +138,11 @@ def remove_stopwords(text):
     return text
 
 
+def stemmize_text(text):
+    from nltk.stem import PorterStemmer
+    ps = PorterStemmer()
+    stems = [ps.stem(w) for w in text]
+    return stems
 
 
 if __name__ == '__main__':

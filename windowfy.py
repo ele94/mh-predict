@@ -50,10 +50,10 @@ def main():
     test_window_frame = pd.DataFrame(test_window)
 
     train_x, train_y = train_window_frame[
-                           ["user", "date", "text", "title", "g_truth", "clean_text", "tokens", "pos_tags"]], \
+                           ["user", "date", "text", "title", "g_truth", "clean_text", "tokens", "pos_tags", "stems", "sequence"]], \
                        train_window_frame[['g_truth']]
     test_x, test_y = test_window_frame[
-                         ["user", "date", "text", "title", "g_truth", "clean_text", "tokens", "pos_tags"]], \
+                         ["user", "date", "text", "title", "g_truth", "clean_text", "tokens", "pos_tags", "stems"]], \
                      test_window_frame[['g_truth']]
 
     encoder = preprocessing.LabelEncoder()
@@ -212,6 +212,8 @@ def join_window_elements(window: list) -> dict:
             joint_window[key] = key_list[0]
         elif key == 'date':
             joint_window[key] = key_list
+        elif key == 'sequence':
+            joint_window[key] = key_list[-1]
         else:
             joint_window[key] = ' .'.join(key_list)
 

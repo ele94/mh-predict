@@ -38,15 +38,23 @@ def main():
     test_x = load_pickle(window_path, fp.test_x_filename)
 
     train_feats = create_features(train_x, normalize_param)
-
     test_feats = create_features(test_x, normalize_param)
 
     save_pickle(feats_path, fp.train_df_feats_filename, train_feats)
     save_pickle(feats_path, fp.test_df_feats_filename, test_feats)
 
+
+
+
     #train_feats.to_csv(r'train_feats.csv')
     #test_feats.to_csv(r'test_feats.csv')
 
+
+def add_user_sequence(users_df, feats):
+    feats["user"] = users_df["user"]
+    feats["sequence"] = users_df["sequence"]
+    feats["g_truth"] = users_df["g_truth"]
+    return feats
 
 def create_features(users_df, normalize=True):
 
@@ -83,7 +91,7 @@ def create_features(users_df, normalize=True):
 
     sid = SentimentIntensityAnalyzer()
     new_feats['sentiment'] = users_df['clean_text'].map(lambda x: round(sid.polarity_scores(x)['compound'], 2))
-    new_feats['nssi_words'] = users_df['tokens'].map(lambda x: sum((' '.join(x)).count(word) for word in nssi_corpus))
+    new_feats['nssi_words'] = users_df['stems'].map(lambda x: sum((' '.join(x)).count(word) for word in nssi_corpus))
     pos_family = {
         'noun': ['NN', 'NNS', 'NNP', 'NNPS'],
         'pron': ['PRP', 'PRP$', 'WP', 'WP$'],

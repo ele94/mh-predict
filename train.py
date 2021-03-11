@@ -40,6 +40,9 @@ def main():
 
     if strategy == 'weights':
         strategy=None
+    elif strategy == 'normal':
+        strategy=None
+        train_weights = None
     else:
         train_weights=None
 

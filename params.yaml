@@ -1,7 +1,8 @@
-classifier: xgboost
-eval_window_size: 10
+classifier: svm
+eval_window_size: 1
 feats: combined
 feats_window_size: 20
 max_features: 5000
 range_max: 100
-strategy: balanced
+strategy: weights
+weights_window_size: 100
