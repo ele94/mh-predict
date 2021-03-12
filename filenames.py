@@ -23,7 +23,7 @@ resul_file = "test.resul.pkl"
 score_file = "test.scores.pkl"
 train_weights_file = "train.weights.pkl"
 
-g_truth_filename = "/home/elena/Documentos/UNED/erisk/2021/data/erisk2021_test_data/golden_truth.txt"
+g_truth_filename = "data/user_data/test_golden_truth.txt"
 
 nssi_corpus_path = "data/nssicorpus.txt"
 
