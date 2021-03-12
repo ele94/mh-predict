@@ -40,7 +40,7 @@ def main():
     test_window_frame = pd.DataFrame(test_window)
 
     train_x, train_y = train_window_frame[
-                           ["user", "date", "text", "title", "g_truth", "clean_text", "tokens", "pos_tags", "stems", "sequence"]], \
+                           ["user", "date", "text", "title", "g_truth", "clean_text", "tokens", "pos_tags", "stems"]], \
                        train_window_frame[['g_truth']]
     test_x, test_y = test_window_frame[
                          ["user", "date", "text", "title", "g_truth", "clean_text", "tokens", "pos_tags", "stems"]], \
