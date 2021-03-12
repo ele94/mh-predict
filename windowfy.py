@@ -143,7 +143,8 @@ def windowfy_sliding_training(users, window_size, param_range_max=-1):
                 window = writings[i:i + window_size]
 
             if len(window) == 0:
-                print("Window: {}, i: {}, len(writings): {}".format(window, i, len(writings)))
+                pass
+                #print("Window: {}, i: {}, len(writings): {}".format(window, i, len(writings)))
 
             joined_window = join_window_elements(window)
             users_windows.append(joined_window)
@@ -171,7 +172,8 @@ def windowfy_sliding_testing(users, window_size, param_range_max=-1):
                 window = writings[i:i + window_size]
 
             if len(window) == 0:
-                print("Window: {}, i: {}, len(writings): {}".format(window, i, len(writings)))
+                pass
+                #print("Window: {}, i: {}, len(writings): {}".format(window, i, len(writings)))
             else:
                 joined_window = join_window_elements(window)
                 users_windows.append(joined_window)
