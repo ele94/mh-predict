@@ -5,17 +5,13 @@
 # next: windowfy,py
 
 from abc import abstractmethod
-import pickle, os
+import os
 import xml.etree.ElementTree as ET
-from sklearn.model_selection import train_test_split
 import contractions
 from nltk import word_tokenize
 import nltk
-import re, itertools
+import re
 from nltk.corpus import stopwords
-import pandas as pd
-from sklearn import model_selection, preprocessing
-from utils import load_pickle
 from utils import save_pickle
 import filenames as fp
 
@@ -82,7 +78,7 @@ def load_user_data(dir_path, dir_name, g_truth):
 
         user_writings = []
 
-        for index, writing in enumerate(root.findall('WRITING')):
+        for writing in root.findall('WRITING'):
             title, text, date = "", "", ""
             if writing.find('TITLE') is not None:
                 title = writing.find('TITLE').text
@@ -98,9 +94,9 @@ def load_user_data(dir_path, dir_name, g_truth):
                     date = ""
 
             if len(title) > 0:
-                user_writing = {"user": user, "g_truth": g_truth[user], "date": date, "text": title + ". " + text, "title": title, "sequence": index}
+                user_writing = {"user": user, "g_truth": g_truth[user], "date": date, "text": title + ". " + text, "title": title}
             else:
-                user_writing = {"user": user, "g_truth": g_truth[user], "date": date, "text": text, "title": title, "sequence": index}
+                user_writing = {"user": user, "g_truth": g_truth[user], "date": date, "text": text, "title": title}
             user_writings.append(user_writing)
 
         users[user] = user_writings

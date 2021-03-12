@@ -2,22 +2,12 @@
 # after prepare.py
 # next: text_featurize.py and/or tfidf_featurize.py
 
-import pickle
-import contractions
-from nltk import word_tokenize
-import nltk
-import re, itertools
-from nltk.corpus import stopwords
 import pandas as pd
-from pprint import pprint
-import itertools
 from sklearn import preprocessing
 from utils import load_pickle
 from utils import save_pickle
 from utils import remove_pickle
 from utils import load_parameters
-import utils
-import os
 import filenames as fp
 import numpy as np
 

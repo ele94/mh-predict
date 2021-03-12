@@ -8,7 +8,6 @@ from utils import load_pickle
 from utils import save_pickle
 from utils import remove_pickle
 from utils import load_parameters
-import os
 import filenames as fp
 
 
@@ -37,25 +36,25 @@ def main():
     tfidf_vect.fit(train_x['clean_text'])
     xtrain_tfidf = tfidf_vect.transform(train_x["clean_text"])
     xtest_tfidf = tfidf_vect.transform(test_x["clean_text"])
-    tfidf_vect = None
+    del tfidf_vect
 
     save_pickle(feats_path, fp.train_word_file, xtrain_tfidf)
     save_pickle(feats_path, fp.test_word_file, xtest_tfidf)
 
-    xtrain_tfidf = None
-    xtest_tfidf = None
+    del xtrain_tfidf
+    del xtest_tfidf
 
-    # print("Ngram-level tf-idf")
-    # # ngram level tf-idf
-    # tfidf_vect_ngram = TfidfVectorizer(analyzer='word', token_pattern=r'\w{1,}', ngram_range=(2, 3), max_features=max_features)
-    # tfidf_vect_ngram.fit(train_x['clean_text'])
-    # xtrain_tfidf_ngram = tfidf_vect_ngram.transform(train_x["clean_text"])
-    # xtest_tfidf_ngram = tfidf_vect_ngram.transform(test_x["clean_text"])
-    #
-    # tfidf_vect_ngram = None
-    #
-    # save_pickle(train_ngram_file, xtrain_tfidf_ngram)
-    # save_pickle(test_ngram_file, xtest_tfidf_ngram)
+    print("Ngram-level tf-idf")
+    # ngram level tf-idf
+    tfidf_vect_ngram = TfidfVectorizer(analyzer='word', token_pattern=r'\w{1,}', ngram_range=(2, 3), max_features=max_features)
+    tfidf_vect_ngram.fit(train_x['clean_text'])
+    xtrain_tfidf_ngram = tfidf_vect_ngram.transform(train_x["clean_text"])
+    xtest_tfidf_ngram = tfidf_vect_ngram.transform(test_x["clean_text"])
+
+    del tfidf_vect_ngram
+
+    save_pickle(feats_path, fp.train_ngram_file, xtrain_tfidf_ngram)
+    save_pickle(feats_path, fp.test_ngram_file, xtest_tfidf_ngram)
 
 
 

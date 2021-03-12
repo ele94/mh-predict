@@ -3,13 +3,9 @@
 # after: text_featurize.py / tfidf_featurize.py / combine_features.py
 # next: classify.py
 
-import pickle
-import nltk
 from sklearn.svm import LinearSVC
 from sklearn.svm import SVC
 from sklearn import naive_bayes, ensemble
-import pandas as pd
-import numpy as np
 from utils import load_pickle
 from utils import save_pickle
 from utils import load_parameters

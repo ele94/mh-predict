@@ -3,21 +3,14 @@
 # after: windowfy.py
 # next: combine_features.py OR train.py
 
-import pickle
 import pandas as pd
-import numpy as np
 from utils import load_pickle
 from utils import save_pickle
 from utils import load_parameters
 from utils import remove_pickle
 import filenames as fp
 
-from sklearn import model_selection, preprocessing, linear_model, naive_bayes, metrics, svm
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-from sklearn import decomposition, ensemble
-
-import pandas, xgboost, numpy, textblob, string, re
-from sklearn.model_selection import train_test_split
+import string, re
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 
@@ -50,11 +43,11 @@ def main():
     #test_feats.to_csv(r'test_feats.csv')
 
 
-def add_user_sequence(users_df, feats):
-    feats["user"] = users_df["user"]
-    feats["sequence"] = users_df["sequence"]
-    feats["g_truth"] = users_df["g_truth"]
-    return feats
+# def add_user_sequence(users_df, feats):
+#     feats["user"] = users_df["user"]
+#     feats["sequence"] = users_df["sequence"]
+#     feats["g_truth"] = users_df["g_truth"]
+#     return feats
 
 def create_features(users_df, normalize=True):
 

@@ -1,8 +1,21 @@
 import os
 import pickle
 import yaml
+import sys
 
 params_file = "params.yaml"
+
+
+######## logger
+
+def logger(message, log_file="log.txt"):
+    print(message)
+    original_stdout = sys.stdout # Save a reference to the original standard output
+    with open(log_file, 'a') as f:
+        sys.stdout = f # Change the standard output to the file we created.
+        print(message)
+        sys.stdout = original_stdout # Reset the standard output to its original value
+
 
 ######### pickles
 

@@ -4,10 +4,8 @@
 
 from utils import eval_performance
 import csv
-import pickle
 import os
 from utils import load_pickle
-from utils import save_pickle
 import filenames as fp
 
 test_data_path = "/home/elena/Documentos/UNED/erisk/2021/data/erisk2021_test_data"

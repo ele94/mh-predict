@@ -1,15 +1,9 @@
-# This is a sample Python script.
-
-# Press Mayús+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 from utils import load_parameters
 from prepare import main as prepare
 from windowfy import main as windowfy
 from text_featurize import main as text_featurize
 from tfidf_featurize import main as tfidf_featurize
 from combine_features import main as combine_features
-from sample_weights import main as sample_weights
-from select_feats import main as select_feats
 from train import main as train
 from classify import main as classify
 from evaluate import main as evaluate
@@ -56,11 +50,11 @@ def experiments():
 
     params = load_parameters()
 
-    feats_window_sizes = [1, 5, 10, 20]
+    feats_window_sizes = [1, 10, 20]
     eval_window_sizes = [1]
     feats = ["text", "tfidf", "combined"]
-    classifiers = ["xgboost", "forest", "svm", "linear_svm"]
-    strategies = ["balanced", "weights"]
+    classifiers = ["xgboost", "svm"]
+    strategies = ["balanced", "normal", "weights"]
 
     experiments = []
 

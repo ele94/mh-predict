@@ -3,10 +3,6 @@
 # after train.py
 # next: evaluate.py and/or evaluate_erisk.py
 
-import pickle
-from sklearn.svm import SVC
-import pandas as pd
-
 from utils import load_pickle
 from utils import save_pickle
 from utils import load_parameters

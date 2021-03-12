@@ -2,12 +2,9 @@
 
 # comes after classify.py
 
-from sklearn.metrics import precision_recall_curve
 import sklearn.metrics as metrics
 from utils import load_pickle
-from utils import save_pickle
 from utils import load_parameters
-import numpy
 import filenames as fp
 
 def main():
