@@ -1,9 +1,5 @@
-from sklearn import model_selection, preprocessing, linear_model, naive_bayes, metrics, svm
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-from sklearn import decomposition, ensemble
+from sklearn.feature_extraction.text import TfidfVectorizer
 
-import pandas, xgboost, numpy, textblob, string
-import pickle
 from utils import load_pickle
 from utils import save_pickle
 from utils import remove_pickle
