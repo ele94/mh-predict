@@ -54,10 +54,7 @@ def create_features(users_df, normalize=True):
     normalize_exceptions = ['char_count', 'word_density']
     exclude_features = ['char_count', 'word_count']
 
-    with open(fp.nssi_corpus_path, 'r') as file:
-        nssi_corpus = file.read().replace('*', '')
-    nssi_corpus = nssi_corpus.split('\n')
-    nssi_corpus.remove('')
+    nssi_corpus = load_nssi_corpus()
 
     new_feats = pd.DataFrame()
 
@@ -84,7 +81,9 @@ def create_features(users_df, normalize=True):
 
     sid = SentimentIntensityAnalyzer()
     new_feats['sentiment'] = users_df['clean_text'].map(lambda x: round(sid.polarity_scores(x)['compound'], 2))
-    new_feats['nssi_words'] = users_df['stems'].map(lambda x: sum((' '.join(x)).count(word) for word in nssi_corpus))
+    for key, values in nssi_corpus.items():
+        new_feats[key] = users_df['stems'].map(lambda x: sum((' '.join(x)).count(word) for word in values))
+    #new_feats['nssi_words'] = users_df['stems'].map(lambda x: sum((' '.join(x)).count(word) for word in nssi_corpus))
     pos_family = {
         'noun': ['NN', 'NNS', 'NNP', 'NNPS'],
         'pron': ['PRP', 'PRP$', 'WP', 'WP$'],
@@ -125,7 +124,28 @@ def create_features(users_df, normalize=True):
 
     return new_feats
 
+def load_nssi_corpus():
 
+    with open(fp.nssi_corpus_path, 'r') as file:
+        nssi_corpus_original = file.read()
+
+    nssi_corpus = nssi_corpus_original.replace('*', '')
+    nssi_corpus = nssi_corpus.replace("Methods of NSSI", '')
+    nssi_corpus = nssi_corpus.replace("NSSI Terms", '')
+    nssi_corpus = nssi_corpus.replace("Instruments Used", '')
+    nssi_corpus = nssi_corpus.replace("Reasons for NSSI", '')
+
+    keys = ["methods", "terms", "instruments", "reasons"]
+
+    nssi_corpus = nssi_corpus.split(':')
+    nssi_corpus.remove('')
+    nssi_corpus = [corpus.split("\n") for corpus in nssi_corpus]
+    new_nssi_corpus = {}
+    for idx, corpus in enumerate(nssi_corpus):
+        new_list = [word for word in corpus if word != ""]
+        new_nssi_corpus[keys[idx]] = new_list
+
+    return new_nssi_corpus
 
 if __name__ == '__main__':
     main()
