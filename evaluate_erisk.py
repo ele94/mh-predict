@@ -8,10 +8,7 @@ import os
 from utils import load_pickle
 import filenames as fp
 
-test_data_path = "/home/elena/Documentos/UNED/erisk/2021/data/erisk2021_test_data"
-g_truth_filename = "golden_truth.txt"
 erisk_eval_file = "erisk.eval.resuls.csv"
-from pprint import pprint
 import numpy as np
 from utils import load_parameters
 from datetime import datetime
@@ -27,7 +24,7 @@ def main():
     resuls_path = fp.get_resuls_path()
     window_path = fp.get_window_path()
 
-    g_truth = load_golden_truth(test_data_path, g_truth_filename)
+    g_truth = load_golden_truth(fp.g_truth_filename)
     test_resuls = load_pickle(resuls_path, fp.resul_file)
     test_scores = load_pickle(resuls_path, fp.score_file)
     test_x = load_pickle(window_path, fp.test_x_filename)
@@ -167,8 +164,8 @@ def process_decisions_w1(user_decisions, user_scores, feat_window_size, max_stra
 
     return decision_list
 
-def load_golden_truth(path, filename):
-    g_path = os.path.join(path, filename)
+def load_golden_truth(filename):
+    g_path = filename
     g_truth = {line.split()[0]: int(line.split()[1]) for line in open(g_path)}
     return g_truth
 
