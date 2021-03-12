@@ -10,39 +10,39 @@ from evaluate import main as evaluate
 from evaluate_erisk import main as eval_erisk
 from utils import update_parameters
 from utils import check_pickle
+from utils import logger
 import filenames as fp
 
 last_experiment = {}
 
 def test(params):
 
-    print("Starting experiment params {}".format(params))
+    logger("Starting experiment params {}".format(params))
 
-    if not check_pickle(fp.get_feats_path(), fp.train_df_feats_filename):
-        print("Windowfying data")
-        windowfy()
-        print("Creating text features")
+    logger("Windowfying data")
+    windowfy()
+    if params["feats"] == "text" or params["feats"] == "combined":
+        logger("Creating text features")
         text_featurize()
-        print("Creating tfidf features")
+    if params["feats"] == "tfidf" or params["feats"] == "combined":
+        logger("Creating tfidf features")
         tfidf_featurize()
-        print("Combining features")
+    if params["feats"] == "combined":
+        logger("Combining features")
         combine_features()
 
-    classifier_file = params["classifier"] + ".pkl"
-    if not check_pickle(fp.get_classifier_path(), classifier_file):
-        print("Training {}".format(params["classifier"]))
-        train()
+    logger("Training {}".format(params["classifier"]))
+    train()
 
-    if not check_pickle(fp.get_resuls_path(), fp.resul_file):
-        print("Classifying")
-        classify()
+    logger("Classifying")
+    classify()
 
     #print("Evaluating")
     #evaluate()
-    print("Evaluating erisk")
+    logger("Evaluating erisk")
     eval_erisk()
 
-    print("Fin experiment {}".format(params))
+    logger("Fin experiment {}".format(params))
 
 params_history = []
 
@@ -50,25 +50,28 @@ def experiments():
 
     params = load_parameters()
 
-    feats_window_sizes = [1, 10, 20]
+    feats_window_sizes = [10]
     eval_window_sizes = [1]
     feats = ["text", "tfidf", "combined"]
-    classifiers = ["xgboost", "svm"]
-    strategies = ["balanced", "normal", "weights"]
+    classifiers = ["svm"]
+    strategies = ["weights"]
+    ranges_max = [(100, -1)] #[(100, 100), (100, -1), (-1, -1)]
 
     experiments = []
-
-    for feats_window_size in feats_window_sizes:
-        for feat in feats:
-            for classifier in classifiers:
-                for strategy in strategies:
-                    for eval_window_size in eval_window_sizes:
-                        params["strategy"] = strategy
-                        params["feats_window_size"] = feats_window_size
-                        params["feats"] = feat
-                        params["classifier"] = classifier
-                        params["eval_window_size"] = eval_window_size
-                        experiments.append(params.copy())
+    for train_range_max, test_range_max in ranges_max:
+        for feats_window_size in feats_window_sizes:
+            for feat in feats:
+                for classifier in classifiers:
+                    for strategy in strategies:
+                        for eval_window_size in eval_window_sizes:
+                            params["strategy"] = strategy
+                            params["feats_window_size"] = feats_window_size
+                            params["feats"] = feat
+                            params["classifier"] = classifier
+                            params["eval_window_size"] = eval_window_size
+                            params["train_range_max"] = train_range_max
+                            params["test_range_max"] = test_range_max
+                            experiments.append(params.copy())
 
     for experiment in experiments:
         do_experiment(experiment.copy())
@@ -81,13 +84,14 @@ def do_experiment(experiment_params):
     if experiment_params not in params_history:
         params_history.append(experiment_params.copy())
         update_parameters(experiment_params.copy())
-        try:
-            test(experiment_params.copy())
-        except Exception as e:
-            print("failed params:{}".format(experiment_params))
-            print("Exception: {}".format(e))
+        test(experiment_params.copy())
+        # try:
+        #     test(experiment_params.copy())
+        # except Exception as e:
+        #     logger("failed params:{}".format(experiment_params))
+        #     logger("Exception: {}".format(e))
     else:
-        print("Skipping duplicated params {}".format(experiment_params))
+        logger("Skipping duplicated params {}".format(experiment_params))
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':

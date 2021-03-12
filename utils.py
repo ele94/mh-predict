@@ -2,7 +2,6 @@ import os
 import pickle
 import yaml
 import sys
-import filenames as fp
 
 params_file = "params.yaml"
 log_file = "log.txt"

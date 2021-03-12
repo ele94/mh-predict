@@ -31,18 +31,17 @@ nssi_corpus_path = "data/nssicorpus.txt"
 #filepaths
 pickles_path = "data/pickles"
 
+resuls_path = "data/resuls"
+
 
 def get_window_path():
-    filepath = os.path.join(pickles_path, str(load_parameters()["range_max"]), str(load_parameters()["feats_window_size"]))
-    return filepath
+    return pickles_path
 
 def get_feats_path():
-    filepath = get_window_path()
-    return filepath
+    return pickles_path
 
 def get_classifier_path():
-    params = load_parameters()
-    return os.path.join(get_feats_path(), str(params["feats"]), str(params["strategy"]), str(params["classifier"]))
+    return pickles_path
 
 def get_resuls_path():
-    return get_classifier_path()
+    return resuls_path

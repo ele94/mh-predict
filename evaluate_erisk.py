@@ -11,6 +11,7 @@ import filenames as fp
 erisk_eval_file = "erisk.eval.resuls.csv"
 import numpy as np
 from utils import load_parameters
+from utils import logger
 from datetime import datetime
 import subprocess
 
@@ -36,6 +37,7 @@ def main():
     eval_resuls = eval_performance(test_resul_proc, g_truth)
 
     write_csv(eval_resuls)
+    logger(eval_resuls)
 
 
 def write_csv(eval_resuls):

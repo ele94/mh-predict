@@ -32,10 +32,11 @@ def main():
     window_type = "count"  # (count, size or time)
     window_size = params["feats_window_size"]
     weights_window_size = params["weights_window_size"]
-    range_max = params["range_max"]
+    train_range_max = params["train_range_max"]
+    test_range_max = params["test_range_max"]
 
-    train_window = windowfy_sliding_training(train_users, window_size, range_max)
-    test_window = windowfy_sliding_testing(test_users, window_size, range_max)
+    train_window = windowfy_sliding_training(train_users, window_size, train_range_max)
+    test_window = windowfy_sliding_testing(test_users, window_size, test_range_max)
 
     train_window_frame = pd.DataFrame(train_window)
     test_window_frame = pd.DataFrame(test_window)
@@ -51,7 +52,7 @@ def main():
     train_y = encoder.fit_transform(train_y)
     test_y = encoder.fit_transform(test_y)
 
-    window_sample_weights = get_window_sample_weights(train_users, weights_window_size, window_size, range_max)
+    window_sample_weights = get_window_sample_weights(train_users, weights_window_size, window_size, train_range_max)
 
     save_pickle(window_path, fp.train_weights_file, window_sample_weights)
     save_pickle(window_path, fp.train_x_filename, train_x)

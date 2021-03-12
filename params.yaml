@@ -1,8 +1,9 @@
 classifier: svm
 eval_window_size: 1
-feats: combined
-feats_window_size: 20
+feats: text
+feats_window_size: 10
 max_features: 5000
-range_max: 100
 strategy: weights
+test_range_max: -1
+train_range_max: 100
 weights_window_size: 100
