@@ -22,11 +22,11 @@ test_feats_file = "test.pkl"
 resul_file = "test.resul.pkl"
 score_file = "test.scores.pkl"
 train_weights_file = "train.weights.pkl"
+erisk_eval_filename = "erisk.eval.resuls.csv"
 
 g_truth_filename = "data/user_data/test_golden_truth.txt"
 
 nssi_corpus_path = "data/nssicorpus.txt"
-
 
 #filepaths
 pickles_path = "data/pickles"

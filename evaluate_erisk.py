@@ -8,7 +8,6 @@ import os
 from utils import load_pickle
 import filenames as fp
 
-erisk_eval_file = "erisk.eval.resuls.csv"
 import numpy as np
 from utils import load_parameters
 from utils import logger
@@ -54,6 +53,7 @@ def write_csv(eval_resuls):
     data.update(params)
     data.update(eval_resuls)
 
+    erisk_eval_file = os.path.join(fp.resuls_path, fp.erisk_eval_filename)
     csv_file = erisk_eval_file
 
     csv_columns = data.keys()
