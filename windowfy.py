@@ -8,6 +8,7 @@ from utils import load_pickle
 from utils import save_pickle
 from utils import remove_pickle
 from utils import load_parameters
+from utils import logger
 import filenames as fp
 import numpy as np
 
@@ -150,7 +151,7 @@ def windowfy_sliding_training(users, window_size, param_range_max=-1):
             users_windows.append(joined_window)
             count += 1
 
-    print("Length of train data after windowfying: {}".format(len(users_windows)))
+    logger("Length of train data after windowfying: {}".format(len(users_windows)))
     return users_windows
 
 
@@ -231,7 +232,7 @@ def get_window_sample_weights(users, weights_window_size, feats_window_size, par
             range_max = param_range_max
 
         if range_max < feats_window_size:
-            print("Skipped user {} because writings size {} and window size {}".format(user, len(user_writings), feats_window_size))
+            logger("Skipped user {} because writings size {} and window size {}".format(user, len(user_writings), feats_window_size))
             continue
         else:
             if user_writings[0]['g_truth'] == 1:
@@ -248,7 +249,7 @@ def get_window_sample_weights(users, weights_window_size, feats_window_size, par
             users_sample_weights.append(list(user_samples_weights))
 
     users_sample_weights = flatten(users_sample_weights)
-    print("Final sample weights length: {}".format(len(users_sample_weights)))
+    logger("Final sample weights length: {}".format(len(users_sample_weights)))
     return users_sample_weights
 
 if __name__ == '__main__':

@@ -4,6 +4,7 @@ from utils import load_pickle
 from utils import save_pickle
 from utils import remove_pickle
 from utils import load_parameters
+from utils import logger
 import filenames as fp
 
 
@@ -26,7 +27,7 @@ def main():
 
     max_features = params["max_features"]
 
-    print("Word-level tf-idf")
+    logger("Word-level tf-idf")
     # word level tf-idf
     tfidf_vect = TfidfVectorizer(analyzer='word', token_pattern=r'\w{1,}', max_features=max_features)
     tfidf_vect.fit(train_x['clean_text'])
@@ -40,7 +41,7 @@ def main():
     del xtrain_tfidf
     del xtest_tfidf
 
-    print("Ngram-level tf-idf")
+    logger("Ngram-level tf-idf")
     # ngram level tf-idf
     tfidf_vect_ngram = TfidfVectorizer(analyzer='word', token_pattern=r'\w{1,}', ngram_range=(2, 3), max_features=max_features)
     tfidf_vect_ngram.fit(train_x['clean_text'])

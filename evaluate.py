@@ -5,6 +5,7 @@
 import sklearn.metrics as metrics
 from utils import load_pickle
 from utils import load_parameters
+from utils import logger
 import filenames as fp
 
 def main():
@@ -21,11 +22,11 @@ def main():
     confusion_matrix = metrics.confusion_matrix(labels, predictions)
     accuracy_score = metrics.accuracy_score(predictions, labels)
 
-    print(classification_report)
+    logger(classification_report)
     #numpy.savetxt('data/Metrics.txt', classification_report) #todo fix this
-    print(confusion_matrix)
+    logger(confusion_matrix)
     #numpy.savetxt('data/Confusion_matrix.txt', confusion_matrix)
-    print(accuracy_score)
+    logger(accuracy_score)
     #numpy.savetxt('data/Accuracy_score.txt', accuracy_score)
 
 

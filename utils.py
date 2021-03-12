@@ -2,13 +2,14 @@ import os
 import pickle
 import yaml
 import sys
+import filenames as fp
 
 params_file = "params.yaml"
-
+log_file = "log.txt"
 
 ######## logger
 
-def logger(message, log_file="log.txt"):
+def logger(message, log_file=log_file):
     print(message)
     original_stdout = sys.stdout # Save a reference to the original standard output
     with open(log_file, 'a') as f:
