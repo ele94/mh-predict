@@ -9,9 +9,9 @@ from classify import main as classify
 from evaluate import main as evaluate
 from evaluate_erisk import main as eval_erisk
 from utils import update_parameters
-from utils import check_pickle
 from utils import logger
 import filenames as fp
+import numpy as np
 
 last_experiment = {}
 
@@ -48,14 +48,16 @@ params_history = []
 
 def experiments():
 
+    np.random.seed(12)
+
     params = load_parameters()
 
-    feats_window_sizes = [10]
+    feats_window_sizes = [10, 10]
     eval_window_sizes = [1]
-    feats = ["text", "tfidf", "combined"]
-    classifiers = ["svm"]
-    strategies = ["weights"]
-    ranges_max = [(100, -1)] #[(100, 100), (100, -1), (-1, -1)]
+    feats = ["combined", "combined"]
+    classifiers = ["svm", "svm"]
+    strategies = ["weights", "weights"]
+    ranges_max = [(100, 100)] #[(100, 100), (100, -1), (-1, -1)]
 
     experiments = []
     for train_range_max, test_range_max in ranges_max:
@@ -84,14 +86,22 @@ def do_experiment(experiment_params):
     if experiment_params not in params_history:
         params_history.append(experiment_params.copy())
         update_parameters(experiment_params.copy())
-        test(experiment_params.copy())
-        # try:
-        #     test(experiment_params.copy())
-        # except Exception as e:
-        #     logger("failed params:{}".format(experiment_params))
-        #     logger("Exception: {}".format(e))
+        #test(experiment_params.copy())
+        try:
+            test(experiment_params.copy())
+        except Exception as e:
+            logger("failed params:{}".format(experiment_params))
+            logger("Exception: {}".format(e))
     else:
-        logger("Skipping duplicated params {}".format(experiment_params))
+        params_history.append(experiment_params.copy())
+        update_parameters(experiment_params.copy())
+        # test(experiment_params.copy())
+        try:
+            test(experiment_params.copy())
+        except Exception as e:
+            logger("failed params:{}".format(experiment_params))
+            logger("Exception: {}".format(e))
+        #logger("Skipping duplicated params {}".format(experiment_params))
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
