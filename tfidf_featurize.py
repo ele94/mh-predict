@@ -8,54 +8,61 @@ from utils import logger
 import filenames as fp
 
 
-def main():
-
+def tfidf():
     params = load_parameters()
-    window_size = params["feats_window_size"]
+    feat = "tfidf"
+    max_features = params["max_features"]
+
+    get_features(feat, max_features)
+
+
+def ngrams():
+    params = load_parameters()
+    feat = "ngram"
+    max_features = params["max_features"]
+
+    get_features(feat, max_features)
+
+
+
+
+def get_features(feat, max_features):
+
     feats_path = fp.get_feats_path()
     window_path = fp.get_window_path()
-    feats = params["feats"]
+
+    if feat == "tfidf":
+        train_file = fp.train_word_file
+        test_file = fp.test_word_file
+        ngram_range = (1, 1)
+    else:
+        train_file = fp.train_ngram_file
+        test_file = fp.test_ngram_file
+        ngram_range = (2, 3)
 
     train_x = load_pickle(window_path, fp.train_x_filename)
     test_x = load_pickle(window_path, fp.test_x_filename)
 
-    max_features = params["max_features"]
 
-    if feats == "tfidf":
+    remove_pickle(feats_path, train_file)
+    remove_pickle(feats_path, test_file)
+    # word level tf-idf
+    tfidf_vect = TfidfVectorizer(analyzer='word', token_pattern=r'\w{1,}', max_features=max_features, ngram_range=ngram_range)
+    tfidf_vect.fit(train_x['clean_text'])
+    xtrain_tfidf = tfidf_vect.transform(train_x["clean_text"])
+    xtest_tfidf = tfidf_vect.transform(test_x["clean_text"])
+    del tfidf_vect
 
-        remove_pickle(feats_path, fp.train_word_file)
-        remove_pickle(feats_path, fp.test_word_file)
+    save_pickle(feats_path, train_file, xtrain_tfidf)
+    save_pickle(feats_path, test_file, xtest_tfidf)
 
-        logger("Word-level tf-idf")
-        # word level tf-idf
-        tfidf_vect = TfidfVectorizer(analyzer='word', token_pattern=r'\w{1,}', max_features=max_features)
-        tfidf_vect.fit(train_x['clean_text'])
-        xtrain_tfidf = tfidf_vect.transform(train_x["clean_text"])
-        xtest_tfidf = tfidf_vect.transform(test_x["clean_text"])
-        del tfidf_vect
+    del xtrain_tfidf
+    del xtest_tfidf
 
-        save_pickle(feats_path, fp.train_word_file, xtrain_tfidf)
-        save_pickle(feats_path, fp.test_word_file, xtest_tfidf)
 
-        del xtrain_tfidf
-        del xtest_tfidf
+def main():
+    return tfidf()
 
-    else:
-
-        logger("Ngram-level tf-idf")
-        # ngram level tf-idf
-        tfidf_vect_ngram = TfidfVectorizer(analyzer='word', token_pattern=r'\w{1,}', ngram_range=(2, 3), max_features=max_features)
-        tfidf_vect_ngram.fit(train_x['clean_text'])
-        xtrain_tfidf_ngram = tfidf_vect_ngram.transform(train_x["clean_text"])
-        xtest_tfidf_ngram = tfidf_vect_ngram.transform(test_x["clean_text"])
-
-        del tfidf_vect_ngram
-
-        save_pickle(feats_path, fp.train_ngram_file, xtrain_tfidf_ngram)
-        save_pickle(feats_path, fp.test_ngram_file, xtest_tfidf_ngram)
-
-        del xtrain_tfidf_ngram
-        del xtest_tfidf_ngram
 
 
 if __name__ == '__main__':

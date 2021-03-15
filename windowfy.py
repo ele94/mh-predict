@@ -250,10 +250,8 @@ def get_window_sample_weights_s2(users, weights_window_size, feats_window_size, 
                 positive_samples_weights = [x / (1.0 * max_size) for x in range((1 * max_size), (2 * max_size), 1)]
                 positive_samples_weights.sort(reverse=True)
                 user_samples_weights = positive_samples_weights
-                print("1: Length of writings: {}, feats_window_size: {}, length of user_samples_weights: {}".format(len(user_writings), feats_window_size, len(user_samples_weights)))
             else:
                 user_samples_weights = np.ones(max_size)
-                print("0: Length of writings: {}, feats_window_size: {}, length of user_samples_weights: {}".format(len(user_writings), feats_window_size, len(user_samples_weights)))
 
             #
             # new_max_size = (range_max - feats_window_size) + 1
