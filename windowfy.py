@@ -16,6 +16,8 @@ import numpy as np
 
 def main():
 
+
+
     params = load_parameters()
 
     window_path = fp.get_window_path()
@@ -34,6 +36,7 @@ def main():
     weights_window_size = params["weights_window_size"]
     train_range_max = params["train_range_max"]
     test_range_max = params["test_range_max"]
+    weights_type = params["weights_type"]
 
     train_window = windowfy_sliding_training(train_users, window_size, train_range_max)
     test_window = windowfy_sliding_testing(test_users, window_size, test_range_max)
@@ -52,7 +55,11 @@ def main():
     train_y = encoder.fit_transform(train_y)
     test_y = encoder.fit_transform(test_y)
 
-    window_sample_weights = get_window_sample_weights(train_users, weights_window_size, window_size, train_range_max)
+    if weights_type == "window":
+        window_sample_weights = get_window_sample_weights(train_users, weights_window_size, window_size, train_range_max)
+    else:
+        window_sample_weights = get_window_sample_weights_s2(train_users, weights_window_size, window_size,
+                                                          train_range_max)
 
     save_pickle(window_path, fp.train_weights_file, window_sample_weights)
     save_pickle(window_path, fp.train_x_filename, train_x)
@@ -214,14 +221,13 @@ def join_window_elements(window: list) -> dict:
     return joint_window
 
 
-def get_window_sample_weights(users, weights_window_size, feats_window_size, param_range_max=-1):
-
+def get_window_sample_weights_s2(users, weights_window_size, feats_window_size, param_range_max=-1):
     flatten = lambda t: [item for sublist in t for item in sublist]
 
-    my_range = int(weights_window_size/feats_window_size)
-    positive_samples_weights = [x / (1.0*my_range) for x in range((1*my_range), (2*my_range), 1)]
-    positive_samples_weights.sort(reverse=True)
-    negative_samples_weights = np.ones(1)
+    # my_range = int(weights_window_size / feats_window_size)
+    # positive_samples_weights = [x / (1.0 * my_range) for x in range((1 * my_range), (2 * my_range), 1)]
+    # positive_samples_weights.sort(reverse=True)
+    # negative_samples_weights = np.ones(1)
 
     users_sample_weights = []
 
@@ -233,20 +239,72 @@ def get_window_sample_weights(users, weights_window_size, feats_window_size, par
             range_max = param_range_max
 
         if range_max < feats_window_size:
+            logger("Skipped user {} because writings size {} and window size {}".format(user, len(user_writings),
+                                                                                        feats_window_size))
+            continue
+        else:
+            my_range = int(len(user_writings) / feats_window_size)
+            max_size = (range_max - feats_window_size) +1
+            if user_writings[0]['g_truth'] == 1:
+                #my_range = int(len(user_writings) / feats_window_size)
+                positive_samples_weights = [x / (1.0 * max_size) for x in range((1 * max_size), (2 * max_size), 1)]
+                positive_samples_weights.sort(reverse=True)
+                user_samples_weights = positive_samples_weights
+                print("1: Length of writings: {}, feats_window_size: {}, length of user_samples_weights: {}".format(len(user_writings), feats_window_size, len(user_samples_weights)))
+            else:
+                user_samples_weights = np.ones(max_size)
+                print("0: Length of writings: {}, feats_window_size: {}, length of user_samples_weights: {}".format(len(user_writings), feats_window_size, len(user_samples_weights)))
+
+            #
+            # new_max_size = (range_max - feats_window_size) + 1
+            # if len(user_samples_weights) < new_max_size:
+            #     end_size = new_max_size - len(user_samples_weights)
+            #     user_samples_weights = list(np.pad(user_samples_weights, (0, end_size), 'minimum'))
+            # else:
+            #     user_samples_weights = list(np.resize(user_samples_weights, new_max_size))
+            #
+            # print("New length: {}".format(len(user_samples_weights)))
+
+            users_sample_weights.append(list(user_samples_weights))
+
+    users_sample_weights = flatten(users_sample_weights)
+    logger("Final sample weights length: {}".format(len(users_sample_weights)))
+    return users_sample_weights
+
+
+def get_window_sample_weights(users, weights_window_size, feats_window_size, param_range_max=-1):
+
+    flatten = lambda t: [item for sublist in t for item in sublist]
+
+    my_range = int(weights_window_size/feats_window_size)
+    positive_samples_weights = [x / (1.0*my_range) for x in range((1*my_range), (2*my_range), 1)]
+    positive_samples_weights.sort(reverse=True)
+    #negative_samples_weights = np.ones(1)
+
+    users_sample_weights = []
+
+    for user, user_writings in users.items():
+
+        if param_range_max < 0 or param_range_max > len(user_writings):
+            range_max = len(user_writings)
+        else:
+            range_max = param_range_max
+
+        max_size = (range_max - feats_window_size) + 1
+        if range_max < feats_window_size:
             logger("Skipped user {} because writings size {} and window size {}".format(user, len(user_writings), feats_window_size))
             continue
         else:
             if user_writings[0]['g_truth'] == 1:
                 user_samples_weights = positive_samples_weights.copy()
+                if len(user_samples_weights) < max_size:
+                    end_size = max_size - len(user_samples_weights)
+                    user_samples_weights = list(np.pad(user_samples_weights, (0, end_size), 'minimum'))
+                else:
+                    user_samples_weights = list(np.resize(user_samples_weights, max_size))
             else:
-                user_samples_weights = negative_samples_weights.copy()
+                user_samples_weights = np.ones(max_size)
 
-            new_max_size = (range_max - feats_window_size) +1
-            if len(user_samples_weights) < new_max_size:
-                end_size = new_max_size - len(user_samples_weights)
-                user_samples_weights = list(np.pad(user_samples_weights, (0, end_size), 'minimum'))
-            else:
-                user_samples_weights = list(np.resize(user_samples_weights, new_max_size))
             users_sample_weights.append(list(user_samples_weights))
 
     users_sample_weights = flatten(users_sample_weights)
