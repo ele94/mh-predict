@@ -12,6 +12,8 @@ from utils import update_parameters
 from utils import logger
 import filenames as fp
 import numpy as np
+import os
+import random as rn
 
 last_experiment = {}
 
@@ -48,15 +50,17 @@ params_history = []
 
 def experiments():
 
-    np.random.seed(12)
+    os.environ['PYTHONHASHSEED'] = '0'
+    np.random.seed(42)
+    rn.seed(121412)
 
     params = load_parameters()
 
-    feats_window_sizes = [10, 10]
+    feats_window_sizes = [5]
     eval_window_sizes = [1]
-    feats = ["combined", "combined"]
-    classifiers = ["svm", "svm"]
-    strategies = ["weights", "weights"]
+    feats = ["tfidf"]
+    classifiers = ["svm"]
+    strategies = ["weights"]
     ranges_max = [(100, 100)] #[(100, 100), (100, -1), (-1, -1)]
 
     experiments = []
@@ -93,15 +97,7 @@ def do_experiment(experiment_params):
             logger("failed params:{}".format(experiment_params))
             logger("Exception: {}".format(e))
     else:
-        params_history.append(experiment_params.copy())
-        update_parameters(experiment_params.copy())
-        # test(experiment_params.copy())
-        try:
-            test(experiment_params.copy())
-        except Exception as e:
-            logger("failed params:{}".format(experiment_params))
-            logger("Exception: {}".format(e))
-        #logger("Skipping duplicated params {}".format(experiment_params))
+        logger("Skipping duplicated params {}".format(experiment_params))
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
