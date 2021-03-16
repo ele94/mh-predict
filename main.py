@@ -66,7 +66,7 @@ def experiments():
     classifiers = ["svm"]
     strategies = ["weights"]
     text_features = ["select"]
-    ranges_max = [(100, -1, -1), (100, -1, 100), (-1, 100, -1)] #[(100, 100), (100, -1), (-1, -1)]
+    ranges_max = [(100, 100, 100), (100, -1, -1), (100, -1, 100), (-1, 100, -1), (-1, 100, 100)] #[(100, 100), (100, -1), (-1, -1)]
     repeat_experiments = False
 
     experiments = []
