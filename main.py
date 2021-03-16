@@ -60,17 +60,17 @@ def experiments():
 
     params = load_parameters()
 
-    feats_window_sizes = [3, 5, 10]
+    feats_window_sizes = [10]
     eval_window_sizes = [1]
-    feats = ["tfidf", "ngram", "text", "combined"]
-    classifiers = ["svm", "xgboost", "linear-svm"]
-    strategies = ["weights", "normal"]
-    text_features = ["select", "all"]
-    ranges_max = [(100, 100)] #[(100, 100), (100, -1), (-1, -1)]
+    feats = ["combined"]
+    classifiers = ["svm"]
+    strategies = ["weights"]
+    text_features = ["select"]
+    ranges_max = [(100, -1, -1), (100, -1, 100), (-1, 100, -1)] #[(100, 100), (100, -1), (-1, -1)]
     repeat_experiments = False
 
     experiments = []
-    for train_range_max, test_range_max in ranges_max:
+    for train_pos_range_max, train_neg_range_max, test_range_max in ranges_max:
         for feats_window_size in feats_window_sizes:
             for feat in feats:
                 for text_feature in text_features:
@@ -83,7 +83,8 @@ def experiments():
                                 params["feats"] = feat
                                 params["classifier"] = classifier
                                 params["eval_window_size"] = eval_window_size
-                                params["train_range_max"] = train_range_max
+                                params["train_pos_range_max"] = train_pos_range_max
+                                params["train_neg_range_max"] = train_neg_range_max
                                 params["test_range_max"] = test_range_max
                                 experiments.append(params.copy())
 

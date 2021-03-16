@@ -34,11 +34,12 @@ def main():
     window_type = "count"  # (count, size or time)
     window_size = params["feats_window_size"]
     weights_window_size = params["weights_window_size"]
-    train_range_max = params["train_range_max"]
+    train_pos_range_max = params["train_pos_range_max"]
+    train_neg_range_max = params["train_neg_range_max"]
     test_range_max = params["test_range_max"]
     weights_type = params["weights_type"]
 
-    train_window = windowfy_sliding_training(train_users, window_size, train_range_max)
+    train_window = windowfy_sliding_training(train_users, window_size, train_pos_range_max, train_neg_range_max)
     test_window = windowfy_sliding_testing(test_users, window_size, test_range_max)
 
     train_window_frame = pd.DataFrame(train_window)
@@ -56,10 +57,11 @@ def main():
     test_y = encoder.fit_transform(test_y)
 
     if weights_type == "window":
-        window_sample_weights = get_window_sample_weights(train_users, weights_window_size, window_size, train_range_max)
+        window_sample_weights = get_window_sample_weights(train_users, weights_window_size, window_size,
+                                                          train_pos_range_max, train_neg_range_max)
     else:
         window_sample_weights = get_window_sample_weights_s2(train_users, weights_window_size, window_size,
-                                                          train_range_max)
+                                                          train_pos_range_max, train_neg_range_max)
 
     save_pickle(window_path, fp.train_weights_file, window_sample_weights)
     save_pickle(window_path, fp.train_x_filename, train_x)
@@ -132,9 +134,13 @@ def main():
 
 # todo check
 
-def windowfy_sliding_training(users, window_size, param_range_max=-1):
+def windowfy_sliding_training(users, window_size, pos_param_range_max=-1, neg_param_range_max=-1):
     users_windows = []
     for user, user_writings in users.items():
+        if user_writings[0]["g_truth"] == 1:
+            param_range_max = pos_param_range_max
+        else:
+            param_range_max = neg_param_range_max
         count = 0
         if param_range_max < 0 or param_range_max > len(user_writings):
             range_max = len(user_writings)
@@ -221,7 +227,7 @@ def join_window_elements(window: list) -> dict:
     return joint_window
 
 
-def get_window_sample_weights_s2(users, weights_window_size, feats_window_size, param_range_max=-1):
+def get_window_sample_weights_s2(users, weights_window_size, feats_window_size, pos_param_range_max=-1, neg_param_range_max=-1):
     flatten = lambda t: [item for sublist in t for item in sublist]
 
     # my_range = int(weights_window_size / feats_window_size)
@@ -232,6 +238,11 @@ def get_window_sample_weights_s2(users, weights_window_size, feats_window_size, 
     users_sample_weights = []
 
     for user, user_writings in users.items():
+
+        if user_writings[0]["g_truth"] == 1:
+            param_range_max = pos_param_range_max
+        else:
+            param_range_max = neg_param_range_max
 
         if param_range_max < 0 or param_range_max > len(user_writings):
             range_max = len(user_writings)
@@ -270,7 +281,7 @@ def get_window_sample_weights_s2(users, weights_window_size, feats_window_size, 
     return users_sample_weights
 
 
-def get_window_sample_weights(users, weights_window_size, feats_window_size, param_range_max=-1):
+def get_window_sample_weights(users, weights_window_size, feats_window_size, pos_param_range_max=-1, neg_param_range_max=-1):
 
     flatten = lambda t: [item for sublist in t for item in sublist]
 
@@ -282,6 +293,11 @@ def get_window_sample_weights(users, weights_window_size, feats_window_size, par
     users_sample_weights = []
 
     for user, user_writings in users.items():
+
+        if user_writings[0]["g_truth"] == 1:
+            param_range_max = pos_param_range_max
+        else:
+            param_range_max = neg_param_range_max
 
         if param_range_max < 0 or param_range_max > len(user_writings):
             range_max = len(user_writings)

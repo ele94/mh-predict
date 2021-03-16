@@ -1,11 +1,12 @@
 classifier: svm
 eval_window_size: 1
-feats: tfidf
-feats_window_size: 5
+feats: combined
+feats_window_size: 10
 max_features: 5000
 strategy: weights
-test_range_max: 100
+test_range_max: -1
 text_features: select
-train_range_max: 100
+train_neg_range_max: -1
+train_pos_range_max: 100
 weights_type: window
 weights_window_size: 100
