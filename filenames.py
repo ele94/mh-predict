@@ -1,7 +1,3 @@
-from utils import load_parameters
-import os
-
-
 # filenames
 train_filename = "clean.train.data.pkl"
 test_filename = "clean.test.data.pkl"

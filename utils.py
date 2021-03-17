@@ -2,9 +2,13 @@ import os
 import pickle
 import yaml
 import sys
+import subprocess
+from datetime import datetime
+import filenames as fp
 
 params_file = "params.yaml"
 log_file = "log.txt"
+report_file = "experiments.txt"
 
 ######## logger
 
@@ -16,6 +20,17 @@ def logger(message, log_file=log_file):
         print(message)
         sys.stdout = original_stdout # Reset the standard output to its original value
 
+
+def write_experiment(message, report_file=report_file):
+    commit = subprocess.check_output(["git", "describe", "--always"]).strip().decode()
+    now = datetime.now()
+    timestamp = now.strftime("%d/%m/%Y %H:%M:%S")
+    message = " ".join([commit, timestamp, message, "\n"])
+
+    report_file = os.path.join(fp.resuls_path, report_file)
+
+    with open(report_file, 'a') as f:
+        f.write(message)
 
 ######### pickles
 
