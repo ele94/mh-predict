@@ -34,8 +34,10 @@ def main():
         train_feats = create_features(train_x, normalize_param)
         test_feats = create_features(test_x, normalize_param)
     else:
-        train_feats = create_select_features(train_x, normalize_param)
-        test_feats = create_select_features(test_x, normalize_param)
+        prons = params["prons"]
+        nssi = params["nssi"]
+        train_feats = create_selects2_features(train_x, normalize_param, prons=prons, nssi=nssi)
+        test_feats = create_selects2_features(test_x, normalize_param, prons=prons, nssi=nssi)
 
     save_pickle(feats_path, fp.train_df_feats_filename, train_feats)
     save_pickle(feats_path, fp.test_df_feats_filename, test_feats)
@@ -125,6 +127,26 @@ def create_features(users_df, normalize=True):
 
     # new features ideas:
     # calcular la media de longitud de todos los usuarios en otro lado y ver las desviaciones
+
+    return new_feats
+
+
+def create_selects2_features(users_df, normalize=True, nssi=True, prons=True):
+    new_feats = pd.DataFrame()
+    text_length = users_df['clean_text'].map(len)
+
+    if prons:
+        reg = r'\bI\b|\bme\b|\bmine\b|\bmy\b|\bmyself\b'
+        new_feats['first_prons'] = users_df['clean_text'].map(lambda x: len(re.findall(reg, x)))
+
+    if nssi:
+        nssi_corpus = load_nssi_corpus()
+        for key, values in nssi_corpus.items():
+            new_feats[key] = users_df['stems'].map(lambda x: sum((' '.join(x)).count(word) for word in values))
+
+    if normalize:
+        for feature in new_feats.columns:
+            new_feats[feature] = new_feats[feature] / text_length
 
     return new_feats
 

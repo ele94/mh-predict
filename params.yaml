@@ -3,10 +3,12 @@ eval_window_size: 1
 feats: combined
 feats_window_size: 10
 max_features: 5000
+nssi: false
+prons: true
 strategy: weights
 test_range_max: -1
 text_features: select
-train_neg_range_max: -1
-train_pos_range_max: 100
-weights_type: window
-weights_window_size: 100
+train_neg_range_max: 100
+train_pos_range_max: -1
+weights_type: all
+weights_window_size: 0
