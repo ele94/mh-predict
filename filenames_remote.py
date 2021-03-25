@@ -21,6 +21,7 @@ train_weights_file = "train.weights.pkl"
 erisk_eval_filename = "erisk.eval.resuls.csv"
 
 g_truth_filename = "/datos/erisk/ml/data/user_data/test_golden_truth.txt"
+train_g_truth_filename = "/datos/erisk/ml/data/user_data/train_golden_truth.txt"
 
 nssi_corpus_path = "/datos/erisk/ml/data/nssicorpus.txt"
 

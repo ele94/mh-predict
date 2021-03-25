@@ -5,6 +5,7 @@ import sys
 import subprocess
 from datetime import datetime
 import filenames as fp
+import csv
 
 params_file = "params.yaml"
 log_file = "log.txt"
@@ -64,6 +65,38 @@ def check_pickle(paths, filename):
         return os.path.isfile(file)
     else:
         return False
+
+
+
+
+def write_csv(eval_resuls):
+
+    data = {}
+    data["commit hash"] = subprocess.check_output(["git", "describe", "--always"]).strip().decode()
+
+    now = datetime.now()
+    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+    data["timestamp"] = dt_string
+
+    params = load_parameters()
+    data.update(params)
+    data.update(eval_resuls)
+
+    erisk_eval_file = os.path.join(fp.resuls_path, fp.erisk_eval_filename)
+    csv_file = erisk_eval_file
+
+    csv_columns = data.keys()
+    dict_data = [data]
+
+    try:
+        with open(csv_file, 'a') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+            if os.path.getsize(csv_file) == 0:
+                writer.writeheader()
+            for data in dict_data:
+                writer.writerow(data)
+    except IOError:
+        print("I/O error")
 
 
 ######## parameters

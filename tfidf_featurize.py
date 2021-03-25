@@ -12,8 +12,13 @@ def tfidf():
     params = load_parameters()
     feat = "tfidf"
     max_features = params["max_features"]
+    type = params["tfidf_type"]
+    if type == "all":
+        only_positives = False
+    else:
+        only_positives = True
 
-    get_features(feat, max_features)
+    get_features(feat, max_features, only_positives=only_positives)
 
 
 def ngrams():
@@ -26,7 +31,7 @@ def ngrams():
 
 
 
-def get_features(feat, max_features):
+def get_features(feat, max_features, only_positives=True):
 
     feats_path = fp.get_feats_path()
     window_path = fp.get_window_path()
@@ -43,12 +48,18 @@ def get_features(feat, max_features):
     train_x = load_pickle(window_path, fp.train_x_filename)
     test_x = load_pickle(window_path, fp.test_x_filename)
 
-
     remove_pickle(feats_path, train_file)
     remove_pickle(feats_path, test_file)
     # word level tf-idf
     tfidf_vect = TfidfVectorizer(analyzer='word', token_pattern=r'\w{1,}', max_features=max_features, ngram_range=ngram_range)
-    tfidf_vect.fit(train_x['clean_text'])
+
+    if only_positives:
+        g_truth = {line.split()[0]: int(line.split()[1]) for line in open(fp.train_g_truth_filename)}
+        train_x_positives = [text for text, user in zip(train_x['clean_text'], train_x['user']) if g_truth[user] == 1]
+        tfidf_vect.fit(train_x_positives)
+    else:
+        tfidf_vect.fit(train_x['clean_text'])  # aqui pasar solo los positivos???
+
     xtrain_tfidf = tfidf_vect.transform(train_x["clean_text"])
     xtest_tfidf = tfidf_vect.transform(test_x["clean_text"])
     del tfidf_vect

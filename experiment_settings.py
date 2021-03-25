@@ -16,15 +16,15 @@ def get_experiment_settings():
     # weights_type = ["all", "window"]
     # weights_window_size = 100
 
-    feats = [("combined", "select", True, True), ("combined", "select", True, False), ("combined", "select", False, True)]
+    feats = [("tfidf", "", True, True, "all"), ("tfidf", "", True, True, "positives")]
     train_strategies = [("weights", "all", 0)]
 
-    write_experiment("Testing combined features with only nssi, only prons, or only nssi and prons.")
+    write_experiment("Testing training tfidf with only positives or all users")
 
     experiments = []
     for train_pos_range_max, train_neg_range_max, test_range_max in ranges_max:
         for feats_window_size in feats_window_sizes:
-            for feat, text_feature, prons, nssi in feats:
+            for feat, text_feature, prons, nssi, tfidf_type in feats:
                 for classifier in classifiers:
                     for strategy, weights_type, weights_window_size in train_strategies:
                         for eval_window_size in eval_window_sizes:
@@ -32,6 +32,7 @@ def get_experiment_settings():
                             params["eval_window_size"] = eval_window_size
                             params["feats_window_size"] = feats_window_size
                             params["feats"] = feat
+                            params["tfidf_type"] = tfidf_type
                             params["text_features"] = text_feature
                             params["prons"] = prons
                             params["nssi"] = nssi
