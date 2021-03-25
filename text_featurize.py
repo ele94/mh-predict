@@ -12,6 +12,7 @@ import filenames as fp
 
 import string, re
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
+from sklearn.preprocessing import KBinsDiscretizer
 
 
 normalize_param = True
@@ -38,6 +39,10 @@ def main():
         nssi = params["nssi"]
         train_feats = create_selects2_features(train_x, normalize_param, prons=prons, nssi=nssi)
         test_feats = create_selects2_features(test_x, normalize_param, prons=prons, nssi=nssi)
+        print(train_feats)
+
+    if params["discretize"] == True:
+        train_feats, test_feats = discretize_features(train_feats, test_feats)
 
     save_pickle(feats_path, fp.train_df_feats_filename, train_feats)
     save_pickle(feats_path, fp.test_df_feats_filename, test_feats)
@@ -225,6 +230,14 @@ def create_select_features(users_df, normalize=True):
     # calcular la media de longitud de todos los usuarios en otro lado y ver las desviaciones
 
     return new_feats
+
+
+def discretize_features(train_feats, test_feats):
+    est = KBinsDiscretizer(n_bins=3, encode='ordinal', strategy='uniform')
+    train = est.fit_transform(train_feats)
+    test = est.transform(test_feats)
+
+    return train, test
 
 
 def load_nssi_corpus():

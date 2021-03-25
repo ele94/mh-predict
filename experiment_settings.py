@@ -16,15 +16,15 @@ def get_experiment_settings():
     # weights_type = ["all", "window"]
     # weights_window_size = 100
 
-    feats = [("tfidf", "", True, True, "all"), ("tfidf", "", True, True, "positives")]
+    feats = [("text", "all", True, True, "all", True), ("text", "select", True, True, "positives", False)]
     train_strategies = [("weights", "all", 0)]
 
-    write_experiment("Testing training tfidf with only positives or all users")
+    write_experiment("Testing discretizer")
 
     experiments = []
     for train_pos_range_max, train_neg_range_max, test_range_max in ranges_max:
         for feats_window_size in feats_window_sizes:
-            for feat, text_feature, prons, nssi, tfidf_type in feats:
+            for feat, text_feature, prons, nssi, tfidf_type, discretize in feats:
                 for classifier in classifiers:
                     for strategy, weights_type, weights_window_size in train_strategies:
                         for eval_window_size in eval_window_sizes:
@@ -42,6 +42,7 @@ def get_experiment_settings():
                             params["train_pos_range_max"] = train_pos_range_max
                             params["train_neg_range_max"] = train_neg_range_max
                             params["test_range_max"] = test_range_max
+                            params["discretize"] = discretize
                             experiments.append(params.copy())
 
     return experiments
