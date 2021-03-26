@@ -19,7 +19,7 @@ def get_experiment_settings():
     new_params["weights_window_size"] = [100]
 
     new_params["feats"] = ["text"]
-    new_params["text_features"] = ["all"]
+    new_params["text_features"] = ["all", "select"]
     new_params["prons"] = [True]
     new_params["nssi"] = [True]
     new_params["tfidf_type"] = ["positives"]
