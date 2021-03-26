@@ -97,7 +97,7 @@ def do_experiment(experiment_params, repeat_experiments, random=False):
     if experiment_params not in params_history or repeat_experiments:
         params_history.append(experiment_params.copy())
         update_parameters(experiment_params.copy())
-        eval = test(experiment_params.copy(), random)
+        #eval = test(experiment_params.copy(), random)
         try:
             eval = test(experiment_params.copy(), random)
         except Exception as e:
