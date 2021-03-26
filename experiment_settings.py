@@ -1,48 +1,45 @@
 from utils import write_experiment
-from utils import load_parameters
+from sklearn.model_selection import ParameterGrid
+import pandas as pd
 
 def get_experiment_settings():
 
-    params = load_parameters()
 
-    feats_window_sizes = [10]
-    eval_window_sizes = [1]
-    # feats = ["combined"]
-    classifiers = ["svm"]
-    # strategies = ["weights"]
-    # text_features = ["select"]
-    ranges_max = [(-1, 100, -1)]  # [(100, 100), (100, -1), (-1, -1)]
-    repeat_experiments = True
-    # weights_type = ["all", "window"]
-    # weights_window_size = 100
+    new_params = {}
 
-    feats = [("text", "all", True, True, "all", True), ("text", "select", True, True, "positives", False)]
-    train_strategies = [("weights", "all", 0)]
+    new_params["feats_window_size"] = [10]
+    new_params["eval_window_size"] = [1]
+    new_params["classifiers"] = ["svm"]
+    new_params["strategies"] = ["weights"]
+    new_params["text_features"] = ["select"]
+    new_params["train_pos_range_max"] = [-1]
+    new_params["train_neg_range_max"] = [100]
+    new_params["test_range_max"] = [-1]
+    new_params["max_features"] = [5000]
+    new_params["weights_type"] = ["window"]
+    new_params["weights_window_size"] = [100]
 
-    write_experiment("Testing discretizer")
+    new_params["feats"] = ["combined"]
+    new_params["text_features"] = ["all"]
+    new_params["prons"] = [True]
+    new_params["nssi"] = [True]
+    new_params["tfidf_type"] = ["positives"]
 
-    experiments = []
-    for train_pos_range_max, train_neg_range_max, test_range_max in ranges_max:
-        for feats_window_size in feats_window_sizes:
-            for feat, text_feature, prons, nssi, tfidf_type, discretize in feats:
-                for classifier in classifiers:
-                    for strategy, weights_type, weights_window_size in train_strategies:
-                        for eval_window_size in eval_window_sizes:
-                            params["classifier"] = classifier
-                            params["eval_window_size"] = eval_window_size
-                            params["feats_window_size"] = feats_window_size
-                            params["feats"] = feat
-                            params["tfidf_type"] = tfidf_type
-                            params["text_features"] = text_feature
-                            params["prons"] = prons
-                            params["nssi"] = nssi
-                            params["strategy"] = strategy
-                            params["weights_type"] = weights_type
-                            params["weights_window_size"] = weights_window_size
-                            params["train_pos_range_max"] = train_pos_range_max
-                            params["train_neg_range_max"] = train_neg_range_max
-                            params["test_range_max"] = test_range_max
-                            params["discretize"] = discretize
-                            experiments.append(params.copy())
+    new_params["discretize"] = [True]
+    new_params["discretize_size"] = [3, 5]
+    new_params["discretize_strategy"] = ['uniform', 'quantile', 'kmeans']
+    new_params["discretize_encode"] = ['onehot', 'onehot-dense', 'ordinal']
+
+    write_experiment("Testing discretizer with more parameters")
+
+    experiments = list(ParameterGrid(new_params))
+
+    experiments = pd.DataFrame(experiments).drop_duplicates().to_dict('records')
+
+    print(experiments)
+    print(len(experiments))
 
     return experiments
+
+if __name__ == '__main__':
+    get_experiment_settings()
