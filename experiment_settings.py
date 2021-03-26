@@ -9,9 +9,8 @@ def get_experiment_settings():
 
     new_params["feats_window_size"] = [10]
     new_params["eval_window_size"] = [1]
-    new_params["classifiers"] = ["svm"]
-    new_params["strategies"] = ["weights"]
-    new_params["text_features"] = ["select"]
+    new_params["classifier"] = ["svm"]
+    new_params["strategy"] = ["weights"]
     new_params["train_pos_range_max"] = [100]
     new_params["train_neg_range_max"] = [100]
     new_params["test_range_max"] = [100]
