@@ -18,16 +18,16 @@ def get_experiment_settings():
     new_params["weights_type"] = ["all"]
     new_params["weights_window_size"] = [100]
 
-    new_params["feats"] = ["text"]
-    new_params["text_features"] = ["all", "select"]
+    new_params["feats"] = ["text", "combined"]
+    new_params["text_features"] = ["select"]
     new_params["prons"] = [True]
     new_params["nssi"] = [True]
     new_params["tfidf_type"] = ["positives"]
 
     new_params["discretize"] = [True]
-    new_params["discretize_size"] = [3, 5]
-    new_params["discretize_strategy"] = ['uniform', 'quantile', 'kmeans']
-    new_params["discretize_encode"] = ['onehot', 'onehot-dense', 'ordinal']
+    new_params["discretize_size"] = [15, 20, 50]
+    new_params["discretize_strategy"] = ['kmeans']  # uniform, quantile, kmeans
+    new_params["discretize_encode"] = ['onehot']   # onehot, onehot-dense, ordinal
 
     write_experiment("Testing discretizer with more parameters")
 

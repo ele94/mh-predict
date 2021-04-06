@@ -42,7 +42,13 @@ def main():
         print(train_feats)
 
     if params["discretize"] == True:
-        train_feats, test_feats = discretize_features(train_feats, test_feats)
+        size = params["discretize_size"]
+        strategy = params["discretize_strategy"]
+        encode = params["discretize_encode"]
+
+        train_feats, test_feats = discretize_features(train_feats, test_feats,
+                                                      size=size, strategy=strategy,
+                                                      encode=encode)
 
     save_pickle(feats_path, fp.train_df_feats_filename, train_feats)
     save_pickle(feats_path, fp.test_df_feats_filename, test_feats)
@@ -232,8 +238,8 @@ def create_select_features(users_df, normalize=True):
     return new_feats
 
 
-def discretize_features(train_feats, test_feats):
-    est = KBinsDiscretizer(n_bins=3, encode='ordinal', strategy='uniform')
+def discretize_features(train_feats, test_feats, size=3, strategy='uniform', encode='ordinal'):
+    est = KBinsDiscretizer(n_bins=size, encode=encode, strategy=strategy)
     train = est.fit_transform(train_feats)
     test = est.transform(test_feats)
 
