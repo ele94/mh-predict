@@ -18,18 +18,19 @@ def get_experiment_settings():
     new_params["weights_type"] = ["all"]
     new_params["weights_window_size"] = [100]
 
-    new_params["feats"] = ["text", "combined"]
-    new_params["text_features"] = ["all", "select"]
+    new_params["feats"] = ["combined", "tfidf"]
+    new_params["text_features"] = ["all"]
     new_params["prons"] = [True]
     new_params["nssi"] = [True]
     new_params["tfidf_type"] = ["positives"]
+    new_params["tfidf_ngrams"] = [True, False]
 
-    new_params["discretize"] = [True]
-    new_params["discretize_size"] = [20, 50, 100]
-    new_params["discretize_strategy"] = ['uniform', 'quantile','kmeans']  # uniform, quantile, kmeans
-    new_params["discretize_encode"] = ['onehot', 'ordinal']   # onehot, onehot-dense, ordinal
+    new_params["discretize"] = [False, True]
+    new_params["discretize_size"] = [50, 100, 500]
+    new_params["discretize_strategy"] = ['quantile']  # uniform, quantile, kmeans
+    new_params["discretize_encode"] = ['onehot']   # onehot, onehot-dense, ordinal
 
-    write_experiment("Testing discretizer with more parameters")
+    write_experiment("Testing new more discretization size options with only tfidf")
 
     experiments = list(ParameterGrid(new_params))
 

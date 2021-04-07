@@ -37,10 +37,10 @@ def test(params, random=False):
         text_featurize()
     if params["feats"] == "tfidf" or params["feats"] == "combined":
         logger("Creating tfidf features")
-        tfidf_featurize()
-    if params["feats"] == "ngram":
-        logger("Creating tfidf ngram features")
-        ngram_featurize()
+        if params["tfidf_ngrams"]:
+            ngram_featurize()
+        else:
+            tfidf_featurize()
     if params["feats"] == "combined":
         logger("Combining features")
         combine_features()
