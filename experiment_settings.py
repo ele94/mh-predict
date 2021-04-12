@@ -30,7 +30,7 @@ def get_experiment_settings():
     new_params["discretize_strategy"] = ['quantile']  # uniform, quantile, kmeans
     new_params["discretize_encode"] = ['onehot']   # onehot, onehot-dense, ordinal
 
-    write_experiment("Testing new more discretization size options with only tfidf")
+    write_experiment("Testing eval window size with sizes 1, 3, 5, and 10")
 
     experiments = list(ParameterGrid(new_params))
 
