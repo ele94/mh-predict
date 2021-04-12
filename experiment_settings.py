@@ -7,7 +7,7 @@ def get_experiment_settings():
 
     new_params = {}
 
-    new_params["training_run"] = [3]
+    new_params["training_run"] = [4]
     new_params["feats_window_size"] = [10]
     new_params["eval_window_size"] = [1]
     new_params["classifier"] = ["svm"]
@@ -20,7 +20,7 @@ def get_experiment_settings():
     new_params["weights_window_size"] = [100]
 
     new_params["feats"] = ["combined"]
-    new_params["text_features"] = ["run3"] # all, select
+    new_params["text_features"] = ["run4"] # all, select
     new_params["prons"] = [True]
     new_params["nssi"] = [True]
     new_params["tfidf_type"] = ["positives"]
