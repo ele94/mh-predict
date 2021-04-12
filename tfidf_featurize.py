@@ -60,6 +60,8 @@ def get_features(feat, max_features, only_positives=True):
     else:
         tfidf_vect.fit(train_x['clean_text'])  # aqui pasar solo los positivos???
 
+    save_pickle(fp.pickles_path, "tfidf_vectorizer.pkl", tfidf_vect)
+
     xtrain_tfidf = tfidf_vect.transform(train_x["clean_text"])
     xtest_tfidf = tfidf_vect.transform(test_x["clean_text"])
     del tfidf_vect

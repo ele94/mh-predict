@@ -48,16 +48,16 @@ def test(params, random=False):
     logger("Training {}".format(params["classifier"]))
     train()
 
-    logger("Classifying")
-    classify()
-
-    #print("Evaluating")
-    #evaluate()
-    logger("Evaluating erisk")
-    eval = eval_erisk()
-
-    logger("Fin experiment {}".format(params))
-    return eval
+    # logger("Classifying")
+    # classify()
+    #
+    # #print("Evaluating")
+    # #evaluate()
+    # logger("Evaluating erisk")
+    # eval = eval_erisk()
+    #
+    # logger("Fin experiment {}".format(params))
+    # return eval
 
 params_history = []
 

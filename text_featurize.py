@@ -243,6 +243,8 @@ def discretize_features(train_feats, test_feats, size=3, strategy='uniform', enc
     train = est.fit_transform(train_feats)
     test = est.transform(test_feats)
 
+    save_pickle(fp.pickles_path, "discretizer.pkl", est)
+
     return train, test
 
 
