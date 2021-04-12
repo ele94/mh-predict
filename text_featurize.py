@@ -34,12 +34,20 @@ def main():
     if params["text_features"] == "all":
         train_feats = create_features(train_x, normalize_param)
         test_feats = create_features(test_x, normalize_param)
-    else:
+    elif params["text_features"] == "select":
         prons = params["prons"]
         nssi = params["nssi"]
         train_feats = create_selects2_features(train_x, normalize_param, prons=prons, nssi=nssi)
         test_feats = create_selects2_features(test_x, normalize_param, prons=prons, nssi=nssi)
         print(train_feats)
+
+    elif params["text_features"] == "run3":
+        train_feats = create_select_features(train_x, normalize_param)
+        test_feats = create_select_features(test_x, normalize_param)
+
+    else:
+        train_feats = create_selects3_features(train_x, normalize_param)
+        test_feats = create_selects3_features(test_x, normalize_param)
 
     if params["discretize"] == True:
         size = params["discretize_size"]
@@ -161,6 +169,26 @@ def create_selects2_features(users_df, normalize=True, nssi=True, prons=True):
 
     return new_feats
 
+def create_selects3_features(users_df, normalize=True):
+    new_feats = pd.DataFrame()
+    text_length = users_df['clean_text'].map(len)
+
+    reg = r'\bI\b|\bme\b|\bmine\b|\bmy\b|\bmyself\b'
+    new_feats['first_prons'] = users_df['clean_text'].map(lambda x: len(re.findall(reg, x)))
+
+    nssi_corpus = load_nssi_corpus()
+    for key, values in nssi_corpus.items():
+        new_feats[key] = users_df['stems'].map(lambda x: sum((' '.join(x)).count(word) for word in values))
+
+    sid = SentimentIntensityAnalyzer()
+    new_feats['sentiment'] = users_df['clean_text'].map(lambda x: round(sid.polarity_scores(x)['compound'], 2))
+
+    if normalize:
+        for feature in new_feats.columns:
+            new_feats[feature] = new_feats[feature] / text_length
+
+    return new_feats
+
 
 def create_select_features(users_df, normalize=True):
 
@@ -177,8 +205,8 @@ def create_select_features(users_df, normalize=True):
     new_feats['word_count'] = users_df['clean_text'].map(lambda x: len(x.split()))
     #new_feats['word_density'] = text_length / (text_length + 1)
 
-    new_feats['punctuation_count'] = users_df['clean_text'].map(
-        lambda x: len("".join(_ for _ in x if _ in string.punctuation)))
+    # new_feats['punctuation_count'] = users_df['clean_text'].map(
+    #     lambda x: len("".join(_ for _ in x if _ in string.punctuation)))
     # new_feats['upper_case_count'] = users_df['clean_text'].map(
     #     lambda x: len([wrd for wrd in x.split() if wrd.isupper()]))
 
